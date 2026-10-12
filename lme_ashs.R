@@ -11,6 +11,9 @@ library(emmeans)
 library(performance)
 library(permuco)
 library(coin)
+library(cowplot)
+library(ggnewscale)
+library(scales)
 
 ###########################
 ######## FOR STATS ########
@@ -281,85 +284,320 @@ ggplot(subject_means_hippocampus, aes(x = Condition, y = MeanCorrelation, fill =
     title = "Hippocampus",
     y = "Mean pattern similarity")
 
-# MANUSCRIPT FIG 
-ggplot(
-  subject_means_hippocampus, 
-  aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(
-    alpha = 0.5, 
-    adjust = 0.6, 
-    width = 0.6, 
-    justification = -0.25, 
-    point_interval = mean_qi, 
-    .width = c(0.66, 0.95)) +
-  geom_boxplot(
-    width = 0.15, 
-    outlier.shape = NA, 
-    alpha = 0.6,
-    color = "black", 
-    linetype = "solid",
-    median.linewidth = 0.5) +
-  geom_jitter(
-    width = 0.08, 
-    size = 1.2, 
-    shape = 21, 
-    color = "black", 
-    fill = "white",
-    alpha = 0.5) +
-  stat_summary(
-    fun = mean, 
-    geom = "point", 
-    color = "black", 
-    size = 3) +
-  scale_x_discrete(
-    labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
-  scale_fill_manual(
-    values = c(
+#######################################################################
+# define colors
+#######################################################################
+
+# define category_colors
+  category_colors <- c(
       "same_show_episode" = "cornflowerblue",
       "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen")) +
-  theme_minimal(base_size = 10) +
+      "diff_show" = "limegreen"
+      )
+
+# define dark versions of category_colors
+  dark_cornflower <- adjustcolor("cornflowerblue", offset = c(-0.3, -0.3, -0.3, 0))
+  dark_hotpink <- adjustcolor("hotpink", offset = c(-0.3, -0.3, -0.3, 0))
+  dark_limegreen <- adjustcolor("limegreen", offset = c(-0.3, -0.3, -0.3, 0))
+
+# define category_colors_dark
+ category_colors_dark <- c(
+      "same_show_episode" = dark_cornflower,
+      "same_show_diff_episode" = dark_hotpink,
+      "diff_show" = dark_limegreen
+      )
+
+#######################################################################
+# define comparisons
+#######################################################################
+
+  comparisons <- list( 
+    c("same_show_episode", "same_show_diff_episode"), 
+    c("same_show_episode", "diff_show"), 
+    c("same_show_diff_episode", "diff_show") 
+    )
+ 
+#######################################################################
+# define raincloud plot function
+#######################################################################
+
+make_raincloud <- function(df, x_var, y_var, x_label = NULL, y_label = NULL, plot_title = "") {
+  p <- ggplot(df, aes(x = {{ x_var }}, y = {{ y_var }}, fill = {{ x_var }})) +
+
+  ## raincloud
+  stat_halfeye(
+    adjust = waiver(), 
+    width = 0.6, 
+    .width = 0, # hide stat_halfeye quantile interval lines
+    shape = NA, # hide stat_halfeye median point
+    position = position_nudge(x = 0.2) # nudge stat_halfeye to the right
+    ) +
+
+  ## individual data points
+  geom_jitter(
+    aes(color = Condition),
+    width = 0.06, 
+    size = 2.5,
+    shape = 16,
+    alpha = 0.5,
+    ) +
+
+ scale_color_manual(
+    values = category_colors) +
+
+  scale_fill_manual(
+    values = category_colors) +
+
+  new_scale_color() +
+
+  ## draw 95% confidence intervals
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    fun.args = list(conf.int = 0.95), 
+    geom = "errorbar", 
+    linewidth = 1.2,
+    width = 0.14,
+    position = position_nudge(x = 0.2) # nudge conf. intervals to the right
+    ) +
+
+  ## draw mean point
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    geom = "point", 
+    shape = 18,
+    size = 3,
+    position = position_nudge(x = 0.2) # nudge mean point to the right
+    ) + 
+
+   scale_color_manual(
+    values = category_colors_dark) +
+
+  scale_y_continuous(
+    labels = label_number(accuracy = 0.01),
+    expand = expansion(mult = c(0.1, 0.2)) # set vertical space above and below data
+    ) +
+
+  theme_classic(base_size = 10) +
+
   theme(
     axis.title.x = element_blank(),
-    axis.title.y = element_text(
-      size = 10),
-    axis.text.x = element_text(
-      size = 8.5, 
-      color = "black"),
+    axis.title.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
     axis.text.y = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.line = element_line(
-      color = "black", 
-      linewidth = 0.5),
-    axis.line.x = element_line(
-      color = "black"),
-    axis.line.y = element_line(
+      size = 7, 
       color = "black"),
     legend.position = "none",
     plot.title = element_text(
       hjust = 0.5, 
       face = "bold", 
-      size = 11,
-      margin = margin(b = 10)),
-    plot.margin = margin(
-      t = 15,
-      r = 5.5,
-      b = 5.5,
-      l = 5.5)) +
+      size = 11
+      )
+      ) +
+
+  labs(
+    title = {{ plot_title }},
+    y = "Mean pattern similarity"
+    ) 
+
+ if (!is.null(x_label)) {
+    p <- p + theme(
+      axis.text.x = element_text(
+      size = 10, 
+      color = "black",
+      hjust = 0,
+      margin = margin(t = 2)
+      )) +
+    scale_x_discrete(
+    labels = c(
+      "same_show_episode" = "Same\ncontext",
+      "same_show_diff_episode" = "Similar\ncontext", 
+      "diff_show" = "Different\ncontext")) 
+  }
+
+   if (!is.null(y_label)) {
+    p <- p + theme(
+         axis.title.y = element_text(
+          size = 10, 
+          angle = 90,
+          margin = margin(r = 4)
+          ))
+  }
+  
+  return(p)
+}
+
+#######################################################################
+# define plots 
+#######################################################################
+ 
+rc1 <- make_raincloud(subject_means_vmpfc, Condition, MeanCorrelation,  x_label = NULL, y_label = TRUE, "vmPFC")
+rc2 <- make_raincloud(subject_means_pmcB, Condition, MeanCorrelation, x_label = NULL, y_label = NULL, "PMC")
+rc3 <- make_raincloud(subject_means_hippocampus, Condition, MeanCorrelation, x_label = NULL, y_label = TRUE, "Hippocampus")
+rc4 <- make_raincloud(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = NULL, y_label = NULL, "PHC")
+rc5 <- make_raincloud(subject_means_perirhinal, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "PRC")
+rc6 <- make_raincloud(subject_means_A1, Condition, MeanCorrelation, x_label = TRUE, y_label = NULL, "A1")
+
+#######################################################################
+# add significance annotations
+#######################################################################
+
+rc1s <- rc1 + geom_signif(
+              annotations = "***",
+              y_position = 0.135,
+              xmin = 1.2,            
+              xmax = 3.2,   
+              hjust = 0.2,
+              vjust = 0.4,
+              tip_length = 0.01, 
+              textsize = 5
+              ) 
+
+rc2s <- rc2 + geom_signif(
+              annotations = "***",
+              y_position = 0.182,
+              xmin = 1.2,            
+              xmax = 3.2,   
+              hjust = 0.2,
+              vjust = 0.4,
+              tip_length = 0.01, 
+              textsize = 5
+              ) 
+
+rc4s <- rc4 + geom_signif(
+              annotations = c("***", "*"),
+              y_position = c(0.16, 0.175),
+              xmin = c(1.2, 2.2),            
+              xmax = c(3.2, 3.2),
+              hjust = 0.2,
+              vjust = 0.4,
+              tip_length = 0.01, 
+              textsize = 5
+              ) 
+
+rc5s <- rc5 + geom_signif(
+              annotations = "**",
+              y_position = 0.13,
+              xmin = 1.2,            
+              xmax = 3.2,   
+              hjust = 0.2,
+              vjust = 0.4,
+              tip_length = 0.01, 
+              textsize = 5
+              ) 
+
+#######################################################################
+# combine plots with cowplot
+#######################################################################
+
+psa_plots <- plot_grid(
+                rc1s, rc2s, rc3, rc4s, rc5s, rc6, ncol = 2
+              )
+psa_plots
+#######################################################################
+# save psa plot
+#######################################################################
+
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot.pdf",
+#   plot = psa_plots,
+#   width = 6.5,
+#   height = 6.75,
+#   units = "in")
+
+# MANUSCRIPT FIG 
+ggplot(
+  subject_means_hippocampus, 
+  aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+  stat_halfeye(
+    adjust = waiver(), 
+    width = 0.6, 
+    .width = 0, # hide stat_halfeye quantile interval lines
+    shape = NA, # hide stat_halfeye median point
+    position = position_nudge(x = 0.2) # nudge stat_halfeye to the right
+    ) +
+
+  ## individual data points
+  geom_jitter(
+    aes(color = Condition),
+    width = 0.06, 
+    size = 2.5,
+    shape = 16,
+    alpha = 0.5,
+    ) +
+
+  scale_x_discrete(
+    labels = c(
+      "same_show_episode" = "Same\ncontext",
+      "same_show_diff_episode" = "Similar\ncontext", 
+      "diff_show" = "Different\ncontext")) +
+
+ scale_color_manual(
+    values = category_colors) +
+
+  scale_fill_manual(
+    values = category_colors) +
+
+  new_scale_color() +
+
+  ## draw 95% confidence intervals
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    fun.args = list(conf.int = 0.95), 
+    geom = "errorbar", 
+    linewidth = 1.2,
+    width = 0.14,
+    position = position_nudge(x = 0.2) # nudge conf. intervals to the right
+    ) +
+
+  ## draw mean point
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    geom = "point", 
+    shape = 18,
+    size = 5,
+    position = position_nudge(x = 0.2) # nudge mean point to the right
+    ) + 
+
+   scale_color_manual(
+    values = category_colors_dark) +
+
+  theme_classic(base_size = 10) +
+
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(
+      size = 8.5),
+    axis.text.x = element_text(
+      size = 7, 
+      color = "black",
+      hjust = 0
+      ),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(
+      size = 7, 
+      color = "black"),
+    legend.position = "none",
+    plot.title = element_text(
+      hjust = 0.5, 
+      face = "bold", 
+      size = 11
+      )
+      ) +
   labs(
     title = "Hippocampus",
     y = "Mean pattern similarity")
-
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hippocampus_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+  
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hippocampus_pattern_similarity_new.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 ################################
 #### PARAHIPPOCAMPUS CORTEX ####
@@ -458,9 +696,9 @@ ggplot(subject_means_parahippocampus,
     color = "black",
     size = 3) +
   scale_x_discrete(labels = c(
-    "same_show_episode" = "Same show, \nsame episode",
-    "same_show_diff_episode" = "Same show, \ndifferent episode",
-    "diff_show" = "Different shows")) +
+    "same_show_episode" = "Same context",
+    "same_show_diff_episode" = "Similar context",
+    "diff_show" = "Different context")) +
   scale_fill_manual(values = c(
     "same_show_episode" = "cornflowerblue",
     "same_show_diff_episode" = "hotpink",
@@ -485,7 +723,7 @@ ggplot(subject_means_parahippocampus,
     legend.position = "none",
     plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
   labs(
-    title = "Parahippocampus",
+    title = "PHC",
     y = "Mean pattern similarity")
 
 # MANUSCRIPT FIGS 
@@ -520,9 +758,9 @@ ggplot(
     size = 3) +
   scale_x_discrete(
     labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
+      "same_show_episode" = "Same context",
+      "same_show_diff_episode" = "Similar context", 
+      "diff_show" = "Different context")) +
   scale_fill_manual(
     values = c(
       "same_show_episode" = "cornflowerblue",
@@ -567,15 +805,15 @@ ggplot(
       b = 5.5,
       l = 5.5)) +
   labs(
-    title = "Parahippocampus",
+    title = "PHC",
     y = "Mean pattern similarity")
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/parahippocampus_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/parahippocampus_pattern_similarity.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 ###########################
 #### PERIRHINAL CORTEX ####
@@ -741,9 +979,9 @@ ggplot(
     size = 3) +
   scale_x_discrete(
     labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
+      "same_show_episode" = "Same context",
+      "same_show_diff_episode" = "Similar context", 
+      "diff_show" = "Different context")) +
   scale_fill_manual(
     values = c(
       "same_show_episode" = "cornflowerblue",
@@ -787,15 +1025,15 @@ ggplot(
       b = 5.5,
       l = 5.5)) +
   labs(
-    title = "Perirhinal Cortex",
+    title = "PRC",
     y = "Mean pattern similarity")
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/perirhinal_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/perirhinal_pattern_similarity.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 #######################################################################################
 #######################################################################################
@@ -807,7 +1045,7 @@ ggsave(
 # List of ROI df names 
 roi_list <- list(
   hippocampus = hippocampus_data_stats,
-  hippocampusNOSUB = hippocampusNOSUB_data_stats,
+  # hippocampusNOSUB = hippocampusNOSUB_data_stats,
   parahippocampus = parahippocampus_data_stats, 
   perirhinal = perirhinal_data_stats
   #ant_hipp = hippocampus_ant_data_stats, 

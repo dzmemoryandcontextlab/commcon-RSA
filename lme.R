@@ -373,12 +373,12 @@ ggplot(
     title = "Ventromedial Prefrontal Cortex (vmPFC)",
     y = "Mean pattern similarity")
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/vmPFC_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/vmPFC_pattern_similarity.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 ##########################
 #### pmc - baldassano ####
@@ -573,12 +573,12 @@ ggplot(
     title = "Posterior Medial Cortex (PMC)",
     y = "Mean pattern similarity")
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/PMC_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/PMC_pattern_similarity.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 #########################
 #### AUDITORY CORTEX ####
@@ -746,12 +746,12 @@ ggplot(
     title = "Primary Auditory Cortex (A1)",
     y = "Mean pattern similarity")
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/A1_pattern_similarity.pdf",
-  plot = last_plot(),
-  width = 3.5,
-  height = 2.5,
-  units = "in")
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/A1_pattern_similarity.pdf",
+#   plot = last_plot(),
+#   width = 3.5,
+#   height = 2.5,
+#   units = "in")
 
 #######################################################################################
 #######################################################################################
