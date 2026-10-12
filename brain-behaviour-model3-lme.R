@@ -306,7 +306,7 @@ head(CORRS_subject_condition_roi_means_raw)
 #####################
 
 # Path 
-base_path <- "/Users/yorkie/Documents/CommCon/data"
+base_path <- "/Volumes/BrusselsGriffon/CommCon/yorkie/data"
 
 # Read files
 same_show_diff_episode_accuracies <- read_csv(
@@ -473,41 +473,82 @@ hippocampus_slope_comparisons <- pairs(
 
 hippocampus_slope_comparisons
 
-# Plot
-hippocampus_plot_data <- plots1_CORRS_with_hit_raw %>%
-  filter(Region == "Hippocampus")
+#######################################################################
+# Filter hippocampus data by condition
+#######################################################################
 
-ggplot(
-  hippocampus_plot_data,
+  ## Different context
+  hippo_different <- plots1_CORRS_with_hit_raw %>%
+    filter(Region == "Hippocampus", Condition == "diff_show")
+
+## Similar context
+  hippo_similar <- plots1_CORRS_with_hit_raw %>%
+    filter(Region == "Hippocampus", Condition == "same_show_diff_episode")
+
+## Same context
+  hippo_same <- plots1_CORRS_with_hit_raw %>%
+    filter(Region == "Hippocampus", Condition == "same_show_episode")
+
+
+#######################################################################
+# define colors
+#######################################################################
+
+# define category_colors
+  category_colors <- c(
+      "same_show_episode" = "cornflowerblue",
+      "same_show_diff_episode" = "hotpink",
+      "diff_show" = "limegreen"
+      )
+
+# define dark versions of category_colors
+  dark_cornflower <- adjustcolor("cornflowerblue", offset = c(-0.3, -0.3, -0.3, 0))
+  dark_hotpink <- adjustcolor("hotpink", offset = c(-0.3, -0.3, -0.3, 0))
+  dark_limegreen <- adjustcolor("limegreen", offset = c(-0.3, -0.3, -0.3, 0))
+
+# define category_colors_dark
+ category_colors_dark <- c(
+      "same_show_episode" = dark_cornflower,
+      "same_show_diff_episode" = dark_hotpink,
+      "diff_show" = dark_limegreen
+      )
+
+
+#######################################################################
+# hippocampus - different context
+#######################################################################
+
+hippo_different <- plots1_CORRS_with_hit_raw %>%
+  filter(Region == "Hippocampus", Condition == "diff_show"),
+
+
+h1 <- ggplot(
+  hippo_different,
   aes(
     x = hit_rate,
     y = mean_correlation,
     color = Condition)) +
   geom_point(
-    size = 2,
-    alpha = 0.7) +
+    size = 2.5,
+    alpha = 0.5,
+    shape = 16
+    ) +
   geom_smooth(
     aes(fill = Condition),
     method = "lm",
     se = TRUE, # 95% confidence interval bands
-    linewidth = 0.8,
+    linewidth = 1,
     alpha = 0.2) +
   scale_color_manual(
-    values = c(
-      "same_show_episode" = "cornflowerblue",
-      "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen"),
+    values = category_colors_dark,
     labels = c(
       "same_show_episode" = "Same show, same episode",
       "same_show_diff_episode" = "Same show, different episode",
       "diff_show" = "Different shows")) +
   scale_fill_manual(
-    values = c(
-      "same_show_episode" = "cornflowerblue",
-      "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen"),
+    values = category_colors,
     guide = "none") +
-  theme_minimal(base_size = 10) +
+  theme_classic(base_size = 10) +
   theme(
     axis.title.x = element_text(size = 10),
     axis.title.y = element_text(size = 10),
@@ -517,14 +558,10 @@ ggplot(
     axis.text.y = element_text(
       size = 8.5,
       color = "black"),
-    axis.line = element_line(
-      color = "black",
-      linewidth = 0.5),
+    axis.line = element_line(color = "black"),
     axis.line.x = element_line(color = "black"),
     axis.line.y = element_line(color = "black"),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 8),
-    legend.position = "right",
+    legend.position = "none",
     plot.title = element_text(
       hjust = 0.5,
       face = "bold",
@@ -536,16 +573,157 @@ ggplot(
       b = 5.5,
       l = 5.5)) +
   labs(
-    title = "Hippocampus",
+    title = "Different context",
     x = "Source memory accuracy",
-    y = "Mean pattern similarity")
+    y = "Mean pattern similarity") +
+    coord_cartesian(ylim = c(.055, 0.11))
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hippocampus_source_mem_corr_pattern_sim.pdf",
-  plot = last_plot(),
-  width = 6.5,
-  height = 2.5,
-  units = "in")
+#######################################################################
+# hippocampus - similar context
+#######################################################################
+
+hippo_similar <- plots1_CORRS_with_hit_raw %>%
+  filter(Region == "Hippocampus", Condition == "same_show_diff_episode")
+
+h2 <- ggplot(
+  hippo_similar,
+  aes(
+    x = hit_rate,
+    y = mean_correlation,
+    color = Condition)) +
+  geom_point(
+    size = 2.5,
+    alpha = 0.5,
+    shape = 16
+    ) +
+  geom_smooth(
+    aes(fill = Condition),
+    method = "lm",
+    se = TRUE, # 95% confidence interval bands
+    linewidth = 1,
+    alpha = 0.2) +
+  scale_color_manual(
+    values = category_colors_dark,
+    labels = c(
+      "same_show_episode" = "Same show, same episode",
+      "same_show_diff_episode" = "Same show, different episode",
+      "diff_show" = "Different shows")) +
+  scale_fill_manual(
+    values = category_colors,
+    guide = "none") +
+  theme_classic(base_size = 10) +
+  theme(
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(
+      size = 8.5,
+      color = "black"),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.line.x = element_line(color = "black"),
+    axis.line.y = element_line(color = "black"),
+    legend.position = "none",
+    plot.title = element_text(
+      hjust = 0.5,
+      face = "bold",
+      size = 11,
+      margin = margin(b = 10)),
+    plot.margin = margin(
+      t = 15,
+      r = 5.5,
+      b = 5.5,
+      l = 5.5)) +
+  labs(
+    title = "Similar context",
+    x = "Source memory accuracy",
+    y = "Mean pattern similarity") +
+    coord_cartesian(ylim = c(.055, 0.11))
+
+
+#######################################################################
+# hippocampus - same context
+#######################################################################
+
+hippo_similar <- plots1_CORRS_with_hit_raw %>%
+  filter(Region == "Hippocampus", Condition == "same_show_episode")
+
+h3 <- ggplot(
+  hippo_similar,
+  aes(
+    x = hit_rate,
+    y = mean_correlation,
+    color = Condition)) +
+  geom_point(
+    size = 2.5,
+    alpha = 0.5,
+    shape = 16
+    ) +
+  geom_smooth(
+    aes(fill = Condition),
+    method = "lm",
+    se = TRUE, # 95% confidence interval bands
+    linewidth = 1,
+    alpha = 0.2) +
+  scale_color_manual(
+    values = category_colors_dark,
+    labels = c(
+      "same_show_episode" = "Same show, same episode",
+      "same_show_diff_episode" = "Same show, different episode",
+      "diff_show" = "Different shows")) +
+  scale_fill_manual(
+    values = category_colors,
+    guide = "none") +
+  theme_classic(base_size = 10) +
+  theme(
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(
+      size = 8.5,
+      color = "black"),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.line.x = element_line(color = "black"),
+    axis.line.y = element_line(color = "black"),
+    legend.position = "none",
+    plot.title = element_text(
+      hjust = 0.5,
+      face = "bold",
+      size = 11,
+      margin = margin(b = 10)),
+    plot.margin = margin(
+      t = 15,
+      r = 5.5,
+      b = 5.5,
+      l = 5.5)) +
+  labs(
+    title = "Same context",
+    x = "Source memory accuracy",
+    y = "Mean pattern similarity") +
+    coord_cartesian(ylim = c(.055, 0.11))
+
+#######################################################################
+# combine hippocampus plots with cowplot
+#######################################################################
+
+hplot <- plot_grid(
+                h1, h2, h3, ncol = 3, labels = "AUTO"
+              )
+
+hplot
+
+
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.svg",
+#   plot = hplot,
+#   width = 6.5,
+#   height = 3,
+#   units = "in")
+
+
+
+
 
 ##########
 ### A1 ###
