@@ -451,7 +451,7 @@ rc1s <- rc1 + geom_signif(
               xmax = 3.2,   
               hjust = 0.2,
               vjust = 0.4,
-              tip_length = 0.01, 
+              tip_length = 0.02, 
               textsize = 5
               ) 
 
@@ -462,7 +462,7 @@ rc2s <- rc2 + geom_signif(
               xmax = 3.2,   
               hjust = 0.2,
               vjust = 0.4,
-              tip_length = 0.01, 
+              tip_length = 0.02, 
               textsize = 5
               ) 
 
@@ -473,7 +473,7 @@ rc4s <- rc4 + geom_signif(
               xmax = c(3.2, 3.2),
               hjust = 0.2,
               vjust = 0.4,
-              tip_length = 0.01, 
+              tip_length = 0.02, 
               textsize = 5
               ) 
 
@@ -484,7 +484,7 @@ rc5s <- rc5 + geom_signif(
               xmax = 3.2,   
               hjust = 0.2,
               vjust = 0.4,
-              tip_length = 0.01, 
+              tip_length = 0.02, 
               textsize = 5
               ) 
 
@@ -493,7 +493,7 @@ rc5s <- rc5 + geom_signif(
 #######################################################################
 
 psa_plots <- plot_grid(
-                rc1s, rc2s, rc3, rc4s, rc5s, rc6, ncol = 2
+                rc1s, rc2s, rc3, rc4s, rc5s, rc6, ncol = 2, labels = "AUTO"
               )
 psa_plots
 #######################################################################
@@ -501,7 +501,7 @@ psa_plots
 #######################################################################
 
 # ggsave(
-#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot.pdf",
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot.svg",
 #   plot = psa_plots,
 #   width = 6.5,
 #   height = 6.75,
