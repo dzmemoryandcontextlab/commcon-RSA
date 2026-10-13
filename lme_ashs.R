@@ -507,6 +507,33 @@ psa_plots
 #   height = 6.75,
 #   units = "in")
 
+#######################################################################
+# PHC PSA plot only!
+#######################################################################
+
+rcPHC <- make_raincloud(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "PHC")
+
+rcPHCs <- rcPHC + geom_signif(
+              annotations = c("***", "*"),
+              y_position = c(0.16, 0.175),
+              xmin = c(1.2, 2.2),            
+              xmax = c(3.2, 3.2),
+              hjust = 0.2,
+              vjust = 0.4,
+              tip_length = 0.02, 
+              textsize = 5
+              ) 
+
+rcPHCs
+
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PHC_only.pdf",
+#   plot = rcPHCs,
+#   width = 3,
+#   height = 3,
+#   units = "in")
+
+
 # MANUSCRIPT FIG 
 ggplot(
   subject_means_hippocampus, 

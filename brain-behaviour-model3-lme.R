@@ -540,13 +540,13 @@ h1 <- ggplot(
     linewidth = 1,
     alpha = 0.2) +
   scale_color_manual(
-    values = category_colors_dark,
+    values = category_colors,
     labels = c(
       "same_show_episode" = "Same show, same episode",
       "same_show_diff_episode" = "Same show, different episode",
       "diff_show" = "Different shows")) +
   scale_fill_manual(
-    values = category_colors,
+    values = category_colors_dark,
     guide = "none") +
   theme_classic(base_size = 10) +
   theme(
@@ -576,8 +576,10 @@ h1 <- ggplot(
     title = "Different context",
     x = "Source memory accuracy",
     y = "Mean pattern similarity") +
-    coord_cartesian(ylim = c(.055, 0.11))
-
+coord_cartesian(
+      ylim = c(.055, 0.11),
+      xlim = c(0.0, 0.8)
+      )
 #######################################################################
 # hippocampus - similar context
 #######################################################################
@@ -603,13 +605,13 @@ h2 <- ggplot(
     linewidth = 1,
     alpha = 0.2) +
   scale_color_manual(
-    values = category_colors_dark,
+    values = category_colors,
     labels = c(
       "same_show_episode" = "Same show, same episode",
       "same_show_diff_episode" = "Same show, different episode",
       "diff_show" = "Different shows")) +
   scale_fill_manual(
-    values = category_colors,
+    values = category_colors_dark,
     guide = "none") +
   theme_classic(base_size = 10) +
   theme(
@@ -638,8 +640,10 @@ h2 <- ggplot(
     title = "Similar context",
     x = "Source memory accuracy",
     y = "Mean pattern similarity") +
-    coord_cartesian(ylim = c(.055, 0.11))
-
+coord_cartesian(
+      ylim = c(.055, 0.11),
+      xlim = c(0.0, 0.8)
+      )
 
 #######################################################################
 # hippocampus - same context
@@ -666,13 +670,13 @@ h3 <- ggplot(
     linewidth = 1,
     alpha = 0.2) +
   scale_color_manual(
-    values = category_colors_dark,
+    values = category_colors,
     labels = c(
       "same_show_episode" = "Same show, same episode",
       "same_show_diff_episode" = "Same show, different episode",
       "diff_show" = "Different shows")) +
   scale_fill_manual(
-    values = category_colors,
+    values = category_colors_dark,
     guide = "none") +
   theme_classic(base_size = 10) +
   theme(
@@ -701,7 +705,10 @@ h3 <- ggplot(
     title = "Same context",
     x = "Source memory accuracy",
     y = "Mean pattern similarity") +
-    coord_cartesian(ylim = c(.055, 0.11))
+    coord_cartesian(
+      ylim = c(.055, 0.11),
+      xlim = c(0.0, 0.8)
+      )
 
 #######################################################################
 # combine hippocampus plots with cowplot
