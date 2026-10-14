@@ -1,3 +1,5 @@
+library(R.matlab)
+
 #############################################################
 ### MODEL 3 - PRE-ONLY CONCEPTUAL REPETITION SUPPRESSION ###
 ############################################################
@@ -152,33 +154,56 @@ ggplot(
     width = 0.7,
     fill = "grey",
     color = "#333333",
-    linewidth = 1) +
+    linewidth = 0.5) +
+
   stat_summary(
-    fun.data = mean_se,
+    fun.data = mean_cl_normal,
+    fun.args = list(conf.int = 0.95), 
     geom = "errorbar",
-    width = 0.2,
-    linewidth = 0.6) +
+    width = 0.14,
+    linewidth = 1.2) +
+
   geom_hline(
     yintercept = 0,
     linetype = "solid",
     linewidth = 0.5 ) +
+
   scale_x_discrete(
     limits = c("vmPFC", "PMC", "Hippocampus", "PHC", "PRC", "A1")) +
   labs(
     x = "ROI",
     y = "Conceptual repetition suppression\n(Segment 1 − Segment 3)") +
-  theme_classic(base_size = 12) +
-  theme(
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 10),
-    axis.ticks = element_line(linewidth = 0.5))
 
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/conceptual-repsup.pdf",
-  plot = last_plot(),
-  width = 6.5,
-  height = 2.5,
-  units = "in")
+  annotate( # add signifiance indicator for PHC
+    "text", 
+    x = 4, 
+    y = 0.36, 
+    label = "**", 
+    color = "black", 
+    size = 5) +
+
+theme_classic(base_size = 10) +
+
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 7),
+    legend.position = "none",
+    plot.title = element_text(
+      hjust = 0.5, 
+      face = "bold", 
+      size = 11
+      )
+      ) 
+
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/conceptual-repsup.pdf",
+#   plot = last_plot(),
+#   width = 6.5,
+#   height = 2.5,
+#   units = "in")
 
 # # 1 tailed ttests 
 # # A1
