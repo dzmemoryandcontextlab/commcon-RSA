@@ -508,10 +508,121 @@ psa_plots
 #   units = "in")
 
 #######################################################################
-# PHC PSA plot only!
+# PHC PSA plot only! (for Halle's slides)
 #######################################################################
 
-rcPHC <- make_raincloud(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "PHC")
+
+# made wide version of make_raincloud function
+make_raincloud_wide <- function(df, x_var, y_var, x_label = NULL, y_label = NULL, plot_title = "") {
+  p <- ggplot(df, aes(x = {{ x_var }}, y = {{ y_var }}, fill = {{ x_var }})) +
+
+  ## raincloud
+  stat_halfeye(
+    adjust = waiver(), 
+    width = 0.3, 
+    .width = 0, # hide stat_halfeye quantile interval lines
+    shape = NA, # hide stat_halfeye median point
+    position = position_nudge(x = 0.2) # nudge stat_halfeye to the right
+    ) +
+
+  ## individual data points
+  geom_jitter(
+    aes(color = Condition),
+    width = 0.03, 
+    size = 2.5,
+    shape = 16,
+    alpha = 0.5,
+    ) +
+
+ scale_color_manual(
+    values = category_colors) +
+
+  scale_fill_manual(
+    values = category_colors) +
+
+  new_scale_color() +
+
+  ## draw 95% confidence intervals
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    fun.args = list(conf.int = 0.95), 
+    geom = "errorbar", 
+    linewidth = 1.2,
+    width = 0.14,
+    position = position_nudge(x = 0.2) # nudge conf. intervals to the right
+    ) +
+
+  ## draw mean point
+  stat_summary(
+    aes(color = Condition),
+    fun.data = mean_cl_normal, 
+    geom = "point", 
+    shape = 18,
+    size = 3,
+    position = position_nudge(x = 0.2) # nudge mean point to the right
+    ) + 
+
+   scale_color_manual(
+    values = category_colors_dark) +
+
+  scale_y_continuous(
+    labels = label_number(accuracy = 0.01),
+    expand = expansion(mult = c(0.1, 0.2)) # set vertical space above and below data
+    ) +
+
+  theme_classic(base_size = 10) +
+
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(
+      size = 7, 
+      color = "black"),
+    legend.position = "none",
+    plot.title = element_text(
+      hjust = 0.5, 
+      face = "bold", 
+      size = 11
+      )
+      ) +
+
+  labs(
+    title = {{ plot_title }},
+    y = "Mean pattern similarity"
+    ) 
+
+ if (!is.null(x_label)) {
+    p <- p + theme(
+      axis.text.x = element_text(
+      size = 10, 
+      color = "black",
+      hjust = 0,
+      margin = margin(t = 2)
+      )) +
+    scale_x_discrete(
+    labels = c(
+      "same_show_episode" = "Same\ncontext",
+      "same_show_diff_episode" = "Similar\ncontext", 
+      "diff_show" = "Different\ncontext")) 
+  }
+
+   if (!is.null(y_label)) {
+    p <- p + theme(
+         axis.title.y = element_text(
+          size = 10, 
+          angle = 90,
+          margin = margin(r = 4)
+          ))
+  }
+  
+  return(p)
+}
+
+
+rcPHC <- make_raincloud_wide(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "Parahippocampal cortex (PHC)")
 
 rcPHCs <- rcPHC + geom_signif(
               annotations = c("***", "*"),
@@ -527,9 +638,9 @@ rcPHCs <- rcPHC + geom_signif(
 rcPHCs
 
 # ggsave(
-#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PHC_only.pdf",
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PHC_only_wide.pdf",
 #   plot = rcPHCs,
-#   width = 3,
+#   width = 5,
 #   height = 3,
 #   units = "in")
 
