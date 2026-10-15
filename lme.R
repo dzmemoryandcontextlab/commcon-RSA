@@ -13,7 +13,7 @@ library(permuco)
 library(coin)
 
 ###########################
-######## FOR STATS ########
+######## FOR STATS ######## 
 ###########################
 
 # Define paths
