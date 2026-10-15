@@ -4,9 +4,8 @@ import os
 import gl
 
 gl.resetdefaults()
-gl.backcolor(255, 255, 255)
+gl.backcolor(0, 0, 0)
 gl.colorbarposition(0)
-
 gl.loadimage('spm152')   
 
 # --- Define each ROI with its own directory ---
@@ -35,10 +34,15 @@ for i, (path, r, g, b) in enumerate(rois, start=1):
     gl.colornode(i, 1, 128, r, g, b, 255)
     gl.colornode(i, 2, 255, r, g, b, 255)
 
-# adjust glass brain
+# adjust glass brain render
 gl.shadername('Glass')
 gl.shaderadjust('Brightness', 0.6)
 gl.linewidth(0)
 
+gl.mosaic(
+    # "L+ " # uncomment for slice number labels \ 
+    "C -60 -36 -22 28;" \
+    "S 5 30 40 S; " \
+    # "C X R 0 S X R 0 A X R 0;" # uncomment for glass brains
+    )
 
-gl.mosaic("L+ C -72 C -60 C -48 C -36; C -22 C -10 C 2 C 16; C 28 C 40 C 52 S X R 0;")
