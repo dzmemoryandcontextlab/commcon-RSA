@@ -760,527 +760,535 @@ ggplot(
 ### PERMUTATION TESTING ###
 ############################
 
-# List of ROI df names 
-roi_list <- list(
-  vmpfc       = vmpfc_data_stats,
-  pmcB         = pmcB_data_stats,
-  v1          = V1_data_stats,
-  motor       = motor_data_stats, 
-  auditory = A1_data_stats 
-)
+# # List of ROI df names 
+# roi_list <- list(
+#   vmpfc       = vmpfc_data_stats,
+#   pmcB         = pmcB_data_stats,
+#   v1          = V1_data_stats,
+#   motor       = motor_data_stats, 
+#   auditory = A1_data_stats 
+# )
 
-# Cond pairs for post hocs
-pairs <- list(
-  c("diff_show", "same_show_episode"),
-  c("diff_show", "same_show_diff_episode"),
-  c("same_show_diff_episode", "same_show_episode")
-)
+# # Cond pairs for post hocs
+# pairs <- list(
+#   c("diff_show", "same_show_episode"),
+#   c("diff_show", "same_show_diff_episode"),
+#   c("same_show_diff_episode", "same_show_episode")
+# )
 
-# Function for permutations 
-run_roi_permutation <- function(dat) {
+# # Function for permutations 
+# run_roi_permutation <- function(dat) {
   
-  # Clean data
-  dat <- dat %>%
-    mutate(
-      Subject     = factor(Subject),
-      Condition   = factor(Condition),
-      Correlation = as.numeric(Correlation))
+#   # Clean data
+#   dat <- dat %>%
+#     mutate(
+#       Subject     = factor(Subject),
+#       Condition   = factor(Condition),
+#       Correlation = as.numeric(Correlation))
   
-  # Overall permutation test (do the correlations differ across conditons?)
-  overall <- independence_test(
-    Correlation ~ Condition | Subject, #This is the approrpaite setup for repeated measures so only permutes within subject
-    data = dat,
-    distribution = approximate(nresample = 10000))
+#   # Overall permutation test (do the correlations differ across conditons?)
+#   overall <- independence_test(
+#     Correlation ~ Condition | Subject, #This is the approrpaite setup for repeated measures so only permutes within subject
+#     data = dat,
+#     distribution = approximate(nresample = 10000))
   
-  # Inspect 
-  y_trans_info <- "identity (raw numeric values)"
+#   # Inspect 
+#   y_trans_info <- "identity (raw numeric values)"
   
-  # Pairwise tests
-  pairwise_res <- map_df(pairs, function(pair) {
+#   # Pairwise tests
+#   pairwise_res <- map_df(pairs, function(pair) {
     
-    dat_pair <- dat %>%
-      filter(Condition %in% pair) %>%
-      mutate(
-        Condition = factor(Condition),
-        Subject   = factor(Subject))
+#     dat_pair <- dat %>%
+#       filter(Condition %in% pair) %>%
+#       mutate(
+#         Condition = factor(Condition),
+#         Subject   = factor(Subject))
     
-    test <- independence_test(
-      Correlation ~ Condition | Subject,
-      data = dat_pair,
-      distribution = approximate(nresample = 10000))
+#     test <- independence_test(
+#       Correlation ~ Condition | Subject,
+#       data = dat_pair,
+#       distribution = approximate(nresample = 10000))
     
-    tibble(
-      Condition1 = pair[1],
-      Condition2 = pair[2],
-      Statistic  = as.numeric(statistic(test)),
-      P_value    = as.numeric(pvalue(test))
-    )}) %>%
-    mutate(P_adj = p.adjust(P_value, method = "holm")) # Apply correction for multiple comparisons 
+#     tibble(
+#       Condition1 = pair[1],
+#       Condition2 = pair[2],
+#       Statistic  = as.numeric(statistic(test)),
+#       P_value    = as.numeric(pvalue(test))
+#     )}) %>%
+#     mutate(P_adj = p.adjust(P_value, method = "holm")) # Apply correction for multiple comparisons 
   
-  # Results
-  list(
-    overall_test     = overall,
-    overall_p        = pvalue(overall),
-    pairwise_results = pairwise_res
-  )}
+#   # Results
+#   list(
+#     overall_test     = overall,
+#     overall_p        = pvalue(overall),
+#     pairwise_results = pairwise_res
+#   )}
 
-# Apply function to ROIs
-roi_results <- lapply(roi_list, run_roi_permutation)
+# # Apply function to ROIs
+# roi_results <- lapply(roi_list, run_roi_permutation)
 
-# Create df of the results for pairwise comparisons (post hocs)
-all_pairwise <- bind_rows(
-  lapply(names(roi_results), function(region) {
-    roi_results[[region]]$pairwise_results %>%
-      mutate(ROI = region)
-  }),
-  .id = NULL
-)
+# # Create df of the results for pairwise comparisons (post hocs)
+# all_pairwise <- bind_rows(
+#   lapply(names(roi_results), function(region) {
+#     roi_results[[region]]$pairwise_results %>%
+#       mutate(ROI = region)
+#   }),
+#   .id = NULL
+# )
 
-# Create df for overall results for each ROI
-overall_summary <- bind_rows(
-  lapply(names(roi_results), function(region) {
-    tibble(
-      ROI = region,
-      Statistic = as.numeric(statistic(roi_results[[region]]$overall_test)),
-      P_value  = as.numeric(roi_results[[region]]$overall_p)
-    )}))
-# Print 
-overall_summary
-all_pairwise
-print(all_pairwise, n = Inf)
+# # Create df for overall results for each ROI
+# overall_summary <- bind_rows(
+#   lapply(names(roi_results), function(region) {
+#     tibble(
+#       ROI = region,
+#       Statistic = as.numeric(statistic(roi_results[[region]]$overall_test)),
+#       P_value  = as.numeric(roi_results[[region]]$overall_p)
+#     )}))
+# # Print 
+# overall_summary
+# all_pairwise
+# print(all_pairwise, n = Inf)
 
-#####################################
-## PLOT THE PERMUTATION STATISTICS ##
-#####################################
-set.seed(123) 
+# #####################################
+# ## PLOT THE PERMUTATION STATISTICS ##
+# #####################################
+# set.seed(123) 
 
-###############
-#### VMPFC ####
-##############
+# ###############
+# #### VMPFC ####
+# ##############
 
-# Data 
-data_perm_plots <- vmpfc_data_stats %>%
-  mutate(
-    Subject   = factor(Subject),
-    Condition = factor(Condition),
-    Correlation = as.numeric(Correlation))
+# # Data 
+# data_perm_plots <- vmpfc_data_stats %>%
+#   mutate(
+#     Subject   = factor(Subject),
+#     Condition = factor(Condition),
+#     Correlation = as.numeric(Correlation))
 
-# Function 
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,   
-        data = d,
-        distribution = approximate(nresample = 0))))}
+# # Function 
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,   
+#         data = d,
+#         distribution = approximate(nresample = 0))))}
 
-# Observed stat
-obs_stat <- get_stat(data_perm_plots)
+# # Observed stat
+# obs_stat <- get_stat(data_perm_plots)
 
-# Permutations 
-n_perm <- 10000  # INCREASE TO 10 000
+# # Permutations 
+# n_perm <- 10000  # INCREASE TO 10 000
 
-perm_stats <- replicate(n_perm, {
-  data_perm <- data_perm_plots %>%
-    group_by(Subject) %>%
-    mutate(Condition = sample(Condition)) %>%  
-    ungroup()
+# perm_stats <- replicate(n_perm, {
+#   data_perm <- data_perm_plots %>%
+#     group_by(Subject) %>%
+#     mutate(Condition = sample(Condition)) %>%  
+#     ungroup()
   
-  get_stat(data_perm)
-})
+#   get_stat(data_perm)
+# })
 
-# Permutation p statistics computed by permutations 
-p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+# # Permutation p statistics computed by permutations 
+# p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
 
-# Plot
-ggplot(tibble(stat = perm_stats), aes(x = stat)) +
-  geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
-  geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
-  annotate(
-    "text",
-    x = obs_stat + 0.4,
-    y = 7,  
-    label = paste0("Observed statistic = ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
-    color = "red",
-    hjust = 0.5,
-    vjust = 0) +
-  labs(
-    title = "VMPFC: Distribution of Permutation Statistics",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot
+# ggplot(tibble(stat = perm_stats), aes(x = stat)) +
+#   geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
+#   geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
+#   annotate(
+#     "text",
+#     x = obs_stat + 0.4,
+#     y = 7,  
+#     label = paste0("Observed statistic = ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
+#     color = "red",
+#     hjust = 0.5,
+#     vjust = 0) +
+#   labs(
+#     title = "VMPFC: Distribution of Permutation Statistics",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
 
-###########################
-#### PMC - BALDASSANO #####
-##########################
+# ###########################
+# #### PMC - BALDASSANO #####
+# ##########################
 
-# Data 
-data_perm_plots <- pmcB_data_stats %>%
-  mutate(
-    Subject   = factor(Subject),
-    Condition = factor(Condition),
-    Correlation = as.numeric(Correlation))
+# # Data 
+# data_perm_plots <- pmcB_data_stats %>%
+#   mutate(
+#     Subject   = factor(Subject),
+#     Condition = factor(Condition),
+#     Correlation = as.numeric(Correlation))
 
-# Function 
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,   
-        data = d,
-        distribution = approximate(nresample = 0))))}
+# # Function 
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,   
+#         data = d,
+#         distribution = approximate(nresample = 0))))}
 
-# Observed stat
-obs_stat <- get_stat(data_perm_plots)
+# # Observed stat
+# obs_stat <- get_stat(data_perm_plots)
 
-# Permutations 
-n_perm <- 10000  # INCREASE TO 10 000
+# # Permutations 
+# n_perm <- 10000  # INCREASE TO 10 000
 
-perm_stats <- replicate(n_perm, {
-  data_perm <- data_perm_plots %>%
-    group_by(Subject) %>%
-    mutate(Condition = sample(Condition)) %>%  
-    ungroup()
+# perm_stats <- replicate(n_perm, {
+#   data_perm <- data_perm_plots %>%
+#     group_by(Subject) %>%
+#     mutate(Condition = sample(Condition)) %>%  
+#     ungroup()
   
-  get_stat(data_perm)
-})
+#   get_stat(data_perm)
+# })
 
-# Permutation p statistics computed by permutations 
-p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+# # Permutation p statistics computed by permutations 
+# p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
 
-# Plot
-ggplot(tibble(stat = perm_stats), aes(x = stat)) +
-  geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
-  geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
-  annotate(
-    "text",
-    x = obs_stat + -0.5,
-    y = 7,  
-    label = paste0("Observed statistic= ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
-    color = "red",
-    hjust = 0.5,
-    vjust = 0) +
-  labs(
-    title = "PMC - Baldassano: Distribution of Permutation Statistics",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot
+# ggplot(tibble(stat = perm_stats), aes(x = stat)) +
+#   geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
+#   geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
+#   annotate(
+#     "text",
+#     x = obs_stat + -0.5,
+#     y = 7,  
+#     label = paste0("Observed statistic= ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
+#     color = "red",
+#     hjust = 0.5,
+#     vjust = 0) +
+#   labs(
+#     title = "PMC - Baldassano: Distribution of Permutation Statistics",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
 
-##############
-#### A1 #####
-#############
+# ##############
+# #### A1 #####
+# #############
 
-# Data 
-data_perm_plots <- A1_data_stats %>%
-  mutate(
-    Subject   = factor(Subject),
-    Condition = factor(Condition),
-    Correlation = as.numeric(Correlation))
+# # Data 
+# data_perm_plots <- A1_data_stats %>%
+#   mutate(
+#     Subject   = factor(Subject),
+#     Condition = factor(Condition),
+#     Correlation = as.numeric(Correlation))
 
-# Function 
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,   
-        data = d,
-        distribution = approximate(nresample = 0))))}
+# # Function 
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,   
+#         data = d,
+#         distribution = approximate(nresample = 0))))}
 
-# Observed stat
-obs_stat <- get_stat(data_perm_plots)
+# # Observed stat
+# obs_stat <- get_stat(data_perm_plots)
 
-# Permutations 
-n_perm <- 10000  # INCREASE TO 10 000
+# # Permutations 
+# n_perm <- 10000  # INCREASE TO 10 000
 
-perm_stats <- replicate(n_perm, {
-  data_perm <- data_perm_plots %>%
-    group_by(Subject) %>%
-    mutate(Condition = sample(Condition)) %>%  
-    ungroup()
+# perm_stats <- replicate(n_perm, {
+#   data_perm <- data_perm_plots %>%
+#     group_by(Subject) %>%
+#     mutate(Condition = sample(Condition)) %>%  
+#     ungroup()
   
-  get_stat(data_perm)
-})
+#   get_stat(data_perm)
+# })
 
-# Permutation p statistics computed by permutations 
-p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+# # Permutation p statistics computed by permutations 
+# p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
 
-# Plot
-ggplot(tibble(stat = perm_stats), aes(x = stat)) +
-  geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
-  geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
-  annotate(
-    "text",
-    x = obs_stat + -0.5,
-    y = 7,  
-    label = paste0("Observed statistic = ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
-    color = "red",
-    hjust = 0.5,
-    vjust = 0) +
-  labs(
-    title = "A1: Distribution of Permutation Statistics",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot
+# ggplot(tibble(stat = perm_stats), aes(x = stat)) +
+#   geom_histogram(bins = length(perm_stats), fill = "grey", color = "black") +
+#   geom_vline(xintercept = obs_stat, color = "red", linewidth = 1.2) +
+#   annotate(
+#     "text",
+#     x = obs_stat + -0.5,
+#     y = 7,  
+#     label = paste0("Observed statistic = ", round(obs_stat,3), "\n(p = ", signif(p_perm,3), ")"),
+#     color = "red",
+#     hjust = 0.5,
+#     vjust = 0) +
+#   labs(
+#     title = "A1: Distribution of Permutation Statistics",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
 
-##############
-#### VMPFC ####
-#############
+# ##############
+# #### VMPFC ####
+# #############
 
-data_perm_plots <- vmpfc_data_stats %>%
-  mutate(
-    Subject     = factor(Subject),
-    Condition   = factor(Condition),
-    Correlation = as.numeric(Correlation) )
+# data_perm_plots <- vmpfc_data_stats %>%
+#   mutate(
+#     Subject     = factor(Subject),
+#     Condition   = factor(Condition),
+#     Correlation = as.numeric(Correlation) )
 
-# Condition pairs
-pairs <- list(
-  c("diff_show", "same_show_episode"),
-  c("diff_show", "same_show_diff_episode"),
-  c("same_show_diff_episode", "same_show_episode"))
+# # Condition pairs
+# pairs <- list(
+#   c("diff_show", "same_show_episode"),
+#   c("diff_show", "same_show_diff_episode"),
+#   c("same_show_diff_episode", "same_show_episode"))
 
-# Statistic function
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,
-        data = d,
-        distribution = approximate(nresample = 0)
-      )))}
+# # Statistic function
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,
+#         data = d,
+#         distribution = approximate(nresample = 0)
+#       )))}
 
-# Run permutations for all pairs
-n_perm <- 10000
+# # Run permutations for all pairs
+# n_perm <- 10000
 
-perm_df <- lapply(pairs, function(pair) {
+# perm_df <- lapply(pairs, function(pair) {
   
-  dat_pair <- data_perm_plots %>%
-    filter(Condition %in% pair)
+#   dat_pair <- data_perm_plots %>%
+#     filter(Condition %in% pair)
   
-  # Observed statistic
-  obs_stat <- get_stat(dat_pair)
+#   # Observed statistic
+#   obs_stat <- get_stat(dat_pair)
   
-  # Permutations
-  perm_stats <- replicate(n_perm, {
-    dat_perm <- dat_pair %>%
-      group_by(Subject) %>%
-      mutate(Condition = sample(Condition)) %>%
-      ungroup()
+#   # Permutations
+#   perm_stats <- replicate(n_perm, {
+#     dat_perm <- dat_pair %>%
+#       group_by(Subject) %>%
+#       mutate(Condition = sample(Condition)) %>%
+#       ungroup()
     
-    get_stat(dat_perm)
-  })
+#     get_stat(dat_perm)
+#   })
   
-  # Empirical p-value
-  p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+#   # Empirical p-value
+#   p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
   
-  tibble(
-    stat     = perm_stats,
-    observed = obs_stat,
-    p_value  = p_perm,
-    contrast = paste(pair[1], "vs", pair[2])
-  )
-}) %>%
-  bind_rows()
+#   tibble(
+#     stat     = perm_stats,
+#     observed = obs_stat,
+#     p_value  = p_perm,
+#     contrast = paste(pair[1], "vs", pair[2])
+#   )
+# }) %>%
+#   bind_rows()
 
-# Plot 
-ggplot(perm_df, aes(x = stat)) +
-  geom_histogram(
-    bins = length(unique(perm_df$stat)),
-    fill = "grey",
-    color = "black") +
-  geom_vline(
-    aes(xintercept = observed),
-    color = "red",
-    linewidth = 1.2) +
-  facet_wrap(~ contrast, scales = "free_y") +
-  geom_text(
-    data = distinct(perm_df, contrast, observed, p_value),
-    aes(
-      x = observed,
-      y = Inf,
-      label = paste0(
-        "Observed statistic = ", round(observed, 3),
-        "\n(p = ", signif(p_value, 3), ")")),
-    vjust = 1.2,
-    hjust = 0.5,
-    color = "red",
-    inherit.aes = FALSE) +
-  labs(
-    title = "VMPFC: Permutation Distributions of Pairwise Post-hoc Tests",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot 
+# ggplot(perm_df, aes(x = stat)) +
+#   geom_histogram(
+#     bins = length(unique(perm_df$stat)),
+#     fill = "grey",
+#     color = "black") +
+#   geom_vline(
+#     aes(xintercept = observed),
+#     color = "red",
+#     linewidth = 1.2) +
+#   facet_wrap(~ contrast, scales = "free_y") +
+#   geom_text(
+#     data = distinct(perm_df, contrast, observed, p_value),
+#     aes(
+#       x = observed,
+#       y = Inf,
+#       label = paste0(
+#         "Observed statistic = ", round(observed, 3),
+#         "\n(p = ", signif(p_value, 3), ")")),
+#     vjust = 1.2,
+#     hjust = 0.5,
+#     color = "red",
+#     inherit.aes = FALSE) +
+#   labs(
+#     title = "VMPFC: Permutation Distributions of Pairwise Post-hoc Tests",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
 
-##########################
-#### PMC - Baldassano ####
-##########################
+# ##########################
+# #### PMC - Baldassano ####
+# ##########################
 
-data_perm_plots <- pmcB_data_stats %>%
-  mutate(
-    Subject     = factor(Subject),
-    Condition   = factor(Condition),
-    Correlation = as.numeric(Correlation))
+# data_perm_plots <- pmcB_data_stats %>%
+#   mutate(
+#     Subject     = factor(Subject),
+#     Condition   = factor(Condition),
+#     Correlation = as.numeric(Correlation))
 
-# Condition pairs
-pairs <- list(
-  c("diff_show", "same_show_episode"),
-  c("diff_show", "same_show_diff_episode"),
-  c("same_show_diff_episode", "same_show_episode"))
+# # Condition pairs
+# pairs <- list(
+#   c("diff_show", "same_show_episode"),
+#   c("diff_show", "same_show_diff_episode"),
+#   c("same_show_diff_episode", "same_show_episode"))
 
-# Statistic function
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,
-        data = d,
-        distribution = approximate(nresample = 0))))}
+# # Statistic function
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,
+#         data = d,
+#         distribution = approximate(nresample = 0))))}
 
-# Run permutations for all pairs
-n_perm <- 10000
+# # Run permutations for all pairs
+# n_perm <- 10000
 
-perm_df <- lapply(pairs, function(pair) {
+# perm_df <- lapply(pairs, function(pair) {
   
-  dat_pair <- data_perm_plots %>%
-    filter(Condition %in% pair)
+#   dat_pair <- data_perm_plots %>%
+#     filter(Condition %in% pair)
   
-  # Observed statistic
-  obs_stat <- get_stat(dat_pair)
+#   # Observed statistic
+#   obs_stat <- get_stat(dat_pair)
   
-  # Permutations
-  perm_stats <- replicate(n_perm, {
-    dat_perm <- dat_pair %>%
-      group_by(Subject) %>%
-      mutate(Condition = sample(Condition)) %>%
-      ungroup()
+#   # Permutations
+#   perm_stats <- replicate(n_perm, {
+#     dat_perm <- dat_pair %>%
+#       group_by(Subject) %>%
+#       mutate(Condition = sample(Condition)) %>%
+#       ungroup()
     
-    get_stat(dat_perm)
-  })
+#     get_stat(dat_perm)
+#   })
   
-  # Empirical p-value
-  p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+#   # Empirical p-value
+#   p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
   
-  tibble(
-    stat     = perm_stats,
-    observed = obs_stat,
-    p_value  = p_perm,
-    contrast = paste(pair[1], "vs", pair[2])
-  )}) %>%
-  bind_rows()
+#   tibble(
+#     stat     = perm_stats,
+#     observed = obs_stat,
+#     p_value  = p_perm,
+#     contrast = paste(pair[1], "vs", pair[2])
+#   )}) %>%
+#   bind_rows()
 
-# Plot 
-ggplot(perm_df, aes(x = stat)) +
-  geom_histogram(
-    bins = length(unique(perm_df$stat)),
-    fill = "grey",
-    color = "black") +
-  geom_vline(
-    aes(xintercept = observed),
-    color = "red",
-    linewidth = 1.2) +
-  facet_wrap(~ contrast, scales = "free_y") +
-  geom_text(
-    data = distinct(perm_df, contrast, observed, p_value),
-    aes(
-      x = observed,
-      y = Inf,
-      label = paste0(
-        "Observed statistic = ", round(observed, 3),
-        "\n(p = ", signif(p_value, 3), ")")),
-    vjust = 1.2,
-    hjust = 0.5,
-    color = "red",
-    inherit.aes = FALSE) +
-  labs(
-    title = "PMC - Baldassano: Permutation Distributions of Pairwise Post-hoc Tests",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot 
+# ggplot(perm_df, aes(x = stat)) +
+#   geom_histogram(
+#     bins = length(unique(perm_df$stat)),
+#     fill = "grey",
+#     color = "black") +
+#   geom_vline(
+#     aes(xintercept = observed),
+#     color = "red",
+#     linewidth = 1.2) +
+#   facet_wrap(~ contrast, scales = "free_y") +
+#   geom_text(
+#     data = distinct(perm_df, contrast, observed, p_value),
+#     aes(
+#       x = observed,
+#       y = Inf,
+#       label = paste0(
+#         "Observed statistic = ", round(observed, 3),
+#         "\n(p = ", signif(p_value, 3), ")")),
+#     vjust = 1.2,
+#     hjust = 0.5,
+#     color = "red",
+#     inherit.aes = FALSE) +
+#   labs(
+#     title = "PMC - Baldassano: Permutation Distributions of Pairwise Post-hoc Tests",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
 
-############
-#### A1 ####
-############
+# ############
+# #### A1 ####
+# ############
 
-data_perm_plots <- A1_data_stats %>%
-  mutate(
-    Subject     = factor(Subject),
-    Condition   = factor(Condition),
-    Correlation = as.numeric(Correlation))
+# data_perm_plots <- A1_data_stats %>%
+#   mutate(
+#     Subject     = factor(Subject),
+#     Condition   = factor(Condition),
+#     Correlation = as.numeric(Correlation))
 
-# Condition pairs
-pairs <- list(
-  c("diff_show", "same_show_episode"),
-  c("diff_show", "same_show_diff_episode"),
-  c("same_show_diff_episode", "same_show_episode"))
+# # Condition pairs
+# pairs <- list(
+#   c("diff_show", "same_show_episode"),
+#   c("diff_show", "same_show_diff_episode"),
+#   c("same_show_diff_episode", "same_show_episode"))
 
-# Statistic function
-get_stat <- function(d) {
-  as.numeric(
-    statistic(
-      independence_test(
-        Correlation ~ Condition | Subject,
-        data = d,
-        distribution = approximate(nresample = 0)
-        )))}
+# # Statistic function
+# get_stat <- function(d) {
+#   as.numeric(
+#     statistic(
+#       independence_test(
+#         Correlation ~ Condition | Subject,
+#         data = d,
+#         distribution = approximate(nresample = 0)
+#         )))}
 
-# Run permutations for all pairs
-n_perm <- 10000
+# # Run permutations for all pairs
+# n_perm <- 10000
 
-perm_df <- lapply(pairs, function(pair) {
+# perm_df <- lapply(pairs, function(pair) {
   
-  dat_pair <- data_perm_plots %>%
-    filter(Condition %in% pair)
+#   dat_pair <- data_perm_plots %>%
+#     filter(Condition %in% pair)
   
-  # Observed statistic
-  obs_stat <- get_stat(dat_pair)
+#   # Observed statistic
+#   obs_stat <- get_stat(dat_pair)
   
-  # Permutations
-  perm_stats <- replicate(n_perm, {
-    dat_perm <- dat_pair %>%
-      group_by(Subject) %>%
-      mutate(Condition = sample(Condition)) %>%
-      ungroup()
+#   # Permutations
+#   perm_stats <- replicate(n_perm, {
+#     dat_perm <- dat_pair %>%
+#       group_by(Subject) %>%
+#       mutate(Condition = sample(Condition)) %>%
+#       ungroup()
     
-    get_stat(dat_perm)
-  })
+#     get_stat(dat_perm)
+#   })
   
-  # Empirical p-value
-  p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
+#   # Empirical p-value
+#   p_perm <- mean(abs(perm_stats) >= abs(obs_stat))
   
-  tibble(
-    stat     = perm_stats,
-    observed = obs_stat,
-    p_value  = p_perm,
-    contrast = paste(pair[1], "vs", pair[2])
-  )
-}) %>%
-  bind_rows()
+#   tibble(
+#     stat     = perm_stats,
+#     observed = obs_stat,
+#     p_value  = p_perm,
+#     contrast = paste(pair[1], "vs", pair[2])
+#   )
+# }) %>%
+#   bind_rows()
 
-# Plot 
-ggplot(perm_df, aes(x = stat)) +
-  geom_histogram(
-    bins = length(unique(perm_df$stat)),
-    fill = "grey",
-    color = "black") +
-  geom_vline(
-    aes(xintercept = observed),
-    color = "red",
-    linewidth = 1.2) +
-  facet_wrap(~ contrast, scales = "free_y") +
-  geom_text(
-    data = distinct(perm_df, contrast, observed, p_value),
-    aes(
-      x = observed,
-      y = Inf,
-      label = paste0(
-        "Observed statistic= ", round(observed, 3),
-        "\n(p = ", signif(p_value, 3), ")")),
-    vjust = 1.2,
-    hjust = 0.5,
-    color = "red",
-    inherit.aes = FALSE) +
-  labs(
-    title = "A1: Permutation Distributions of Pairwise Post-hoc Tests",
-    x = "Permutation Statistic",
-    y = "Count") +
-  theme_classic()
+# # Plot 
+# ggplot(perm_df, aes(x = stat)) +
+#   geom_histogram(
+#     bins = length(unique(perm_df$stat)),
+#     fill = "grey",
+#     color = "black") +
+#   geom_vline(
+#     aes(xintercept = observed),
+#     color = "red",
+#     linewidth = 1.2) +
+#   facet_wrap(~ contrast, scales = "free_y") +
+#   geom_text(
+#     data = distinct(perm_df, contrast, observed, p_value),
+#     aes(
+#       x = observed,
+#       y = Inf,
+#       label = paste0(
+#         "Observed statistic= ", round(observed, 3),
+#         "\n(p = ", signif(p_value, 3), ")")),
+#     vjust = 1.2,
+#     hjust = 0.5,
+#     color = "red",
+#     inherit.aes = FALSE) +
+#   labs(
+#     title = "A1: Permutation Distributions of Pairwise Post-hoc Tests",
+#     x = "Permutation Statistic",
+#     y = "Count") +
+#   theme_classic()
+
+
+
+
+
+
+
+
 

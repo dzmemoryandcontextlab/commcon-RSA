@@ -551,13 +551,12 @@ h1 <- ggplot(
   theme_classic(base_size = 10) +
   theme(
     axis.title.x = element_text(size = 10),
-    axis.title.y = element_text(size = 10),
+    axis.title.y = element_blank(),
     axis.text.x = element_text(
       size = 8.5,
       color = "black"),
-    axis.text.y = element_text(
-      size = 8.5,
-      color = "black"),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
     axis.line = element_line(color = "black"),
     axis.line.x = element_line(color = "black"),
     axis.line.y = element_line(color = "black"),
@@ -681,12 +680,13 @@ h3 <- ggplot(
   theme_classic(base_size = 10) +
   theme(
     axis.title.x = element_text(size = 10),
-    axis.title.y = element_blank(),
+    axis.title.y = element_text(size = 10),
     axis.text.x = element_text(
       size = 8.5,
       color = "black"),
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(),
+    axis.text.y = element_text(
+      size = 8.5,
+      color = "black"),
     axis.line = element_line(color = "black"),
     axis.line.x = element_line(color = "black"),
     axis.line.y = element_line(color = "black"),
@@ -705,7 +705,7 @@ h3 <- ggplot(
     title = "Same context",
     x = "Source memory accuracy",
     y = "Mean pattern similarity") +
-    coord_cartesian(
+coord_cartesian(
       ylim = c(.055, 0.11),
       xlim = c(0.0, 0.8)
       )
@@ -715,20 +715,58 @@ h3 <- ggplot(
 #######################################################################
 
 hplot <- plot_grid(
-                h1, h2, h3, ncol = 3, labels = "AUTO"
+                h3, h2, h1, ncol = 3, labels = "AUTO", rel_widths = c(1.2, 1, 1)
               )
 
 hplot
 
+# save combined plots as svg
+ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.svg",
+  plot = hplot,
+  width = 6.5,
+  height = 3,
+  units = "in")
 
-# ggsave(
-#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.svg",
-#   plot = hplot,
-#   width = 6.5,
-#   height = 3,
-#   units = "in")
+# save combined plots as pdf
+  ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.pdf",
+  plot = hplot,
+  width = 6.5,
+  height = 3,
+  units = "in")
 
+# save just same context condition (stretched) as svg
+ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.svg",
+  plot = h3,
+  width = 6.5,
+  height = 3,
+  units = "in")
 
+  # save just same context condition (stretched) as pdf
+ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.pdf",
+  plot = h3,
+  width = 6.5,
+  height = 3,
+  units = "in")
+
+# save just same context condition (not stretched) as svg
+ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.svg",
+  plot = h3,
+  width = 3,
+  height = 3,
+  units = "in")
+
+  # save just same context condition (not stretched) as pdf
+ggsave(
+  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.pdf",
+  plot = h3,
+  width = 3,
+  height = 3,
+  units = "in")
 
 
 
