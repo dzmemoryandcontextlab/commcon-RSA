@@ -1718,6 +1718,13 @@ psa_plots
 #   height = 6.75,
 #   units = "in")
 
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot.pdf",
+#   plot = psa_plots,
+#   width = 6.5,
+#   height = 6.75,
+#   units = "in")
+
 #######################################################################
 # PHC PSA plot only! (for Halle's slides)
 #######################################################################
