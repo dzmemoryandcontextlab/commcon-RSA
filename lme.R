@@ -231,147 +231,147 @@ subject_means_vmpfc <- vmpfc_data_plots %>%
 # Position of sig bars
 y_max <- max(subject_means_vmpfc$MeanCorrelation, na.rm = TRUE)
 
-# Violin plot 
-ggplot(subject_means_vmpfc, aes(x = Condition, y = MeanCorrelation)) +
-  geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
-                              "same_show_diff_episode" = "Same show, different episode", 
-                              "diff_show" = "Different shows")) +
-  geom_jitter(shape = 21, color = "black", fill = "grey", 
-              position = position_jitter(width = 0.15),
-              size = 2, alpha = 0.5, show.legend = FALSE) +
-  #geom_signif(comparisons = list(c("diff_show", "same_show_diff_episode"),
-  #                               c("diff_show", "same_show_episode")),
-  #            annotations = c("***", "***"),
-  #            y_position = c(y_max + 0.009, y_max + 0.02),
-  #            tip_length = 0.02, textsize = 20
-  #) +
-  theme_minimal() +
-  theme(
-    axis.line = element_line(color = "black"),       
-    axis.text.x = element_text(color = "black", size = 14),
-    axis.text.y = element_text(color = "black", size = 14),
-    axis.title.x = element_text(color = "black", size = 16, face = "bold"),
-    axis.title.y = element_text(color = "black", size = 16, face = "bold"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "bold") 
-  ) +
-  labs(title = "VM Prefrontal Cortex (vmPFC)",
-       y = "Mean pattern similarity", x = "")
+# # Violin plot 
+# ggplot(subject_means_vmpfc, aes(x = Condition, y = MeanCorrelation)) +
+#   geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
+#                               "same_show_diff_episode" = "Same show, different episode", 
+#                               "diff_show" = "Different shows")) +
+#   geom_jitter(shape = 21, color = "black", fill = "grey", 
+#               position = position_jitter(width = 0.15),
+#               size = 2, alpha = 0.5, show.legend = FALSE) +
+#   #geom_signif(comparisons = list(c("diff_show", "same_show_diff_episode"),
+#   #                               c("diff_show", "same_show_episode")),
+#   #            annotations = c("***", "***"),
+#   #            y_position = c(y_max + 0.009, y_max + 0.02),
+#   #            tip_length = 0.02, textsize = 20
+#   #) +
+#   theme_minimal() +
+#   theme(
+#     axis.line = element_line(color = "black"),       
+#     axis.text.x = element_text(color = "black", size = 14),
+#     axis.text.y = element_text(color = "black", size = 14),
+#     axis.title.x = element_text(color = "black", size = 16, face = "bold"),
+#     axis.title.y = element_text(color = "black", size = 16, face = "bold"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "bold") 
+#   ) +
+#   labs(title = "VM Prefrontal Cortex (vmPFC)",
+#        y = "Mean pattern similarity", x = "")
 
-# Raincloud plot
-ggplot(subject_means_vmpfc, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
-  geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
-                median.linewidth = 0.5) +
-  geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, \nsame episode",
-                              "same_show_diff_episode" = "Same show, \ndifferent episode", 
-                              "diff_show" = "Different shows")) +
-  scale_fill_manual(values = c(
-    "same_show_episode" = "cornflowerblue",
-    "same_show_diff_episode" = "hotpink",
-    "diff_show" = "limegreen")) +
-  geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
-              annotations = c("*p = 0.000"),
-              y_position = c(y_max + 0.015, y_max + 0.029),
-              tip_length = 0.02, textsize = 4) +
-  theme_minimal(base_size = 14) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 25),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 20, color = "black"),
-    axis.line = element_line(color = "black", linewidth = 0.5),
-    axis.line.x = element_line(color = "black"),
-    axis.line.y = element_line(color = "black"),
-    legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
-  labs(
-    title = "Ventromedial Prefrontal Cortex (vmPFC)\n",
-    y = "Mean pattern similarity")
+# # Raincloud plot
+# ggplot(subject_means_vmpfc, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
+#   geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
+#                 median.linewidth = 0.5) +
+#   geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, \nsame episode",
+#                               "same_show_diff_episode" = "Same show, \ndifferent episode", 
+#                               "diff_show" = "Different shows")) +
+#   scale_fill_manual(values = c(
+#     "same_show_episode" = "cornflowerblue",
+#     "same_show_diff_episode" = "hotpink",
+#     "diff_show" = "limegreen")) +
+#   geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
+#               annotations = c("*p = 0.000"),
+#               y_position = c(y_max + 0.015, y_max + 0.029),
+#               tip_length = 0.02, textsize = 4) +
+#   theme_minimal(base_size = 14) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(size = 25),
+#     axis.text.x = element_text(size = 20, color = "black"),
+#     axis.text.y = element_text(size = 20, color = "black"),
+#     axis.line = element_line(color = "black", linewidth = 0.5),
+#     axis.line.x = element_line(color = "black"),
+#     axis.line.y = element_line(color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
+#   labs(
+#     title = "Ventromedial Prefrontal Cortex (vmPFC)\n",
+#     y = "Mean pattern similarity")
 
 
-# MANUSCRIPT FIG
-ggplot(
-  subject_means_vmpfc, 
-  aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(
-    alpha = 0.5, 
-    adjust = 0.6, 
-    width = 0.6, 
-    justification = -0.25, 
-    point_interval = mean_qi, 
-    .width = c(0.66, 0.95)) +
-  geom_boxplot(
-    width = 0.15, 
-    outlier.shape = NA, 
-    alpha = 0.6,
-    color = "black", 
-    linetype = "solid",
-    median.linewidth = 0.5) +
-  geom_jitter(
-    width = 0.08, 
-    size = 1.2, 
-    shape = 21, 
-    color = "black", 
-    fill = "white", 
-    alpha = 0.5) +
-  stat_summary(
-    fun = mean, 
-    geom = "point", 
-    color = "black", 
-    size = 3) +
-  scale_x_discrete(
-    labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
-  scale_fill_manual(
-    values = c(
-      "same_show_episode" = "cornflowerblue",
-      "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen")) +
-  geom_signif(
-    comparisons = list(c("diff_show", "same_show_episode")),
-    annotations = "*p < .001",
-    y_position = y_max + 0.01,
-    tip_length = 0.02, 
-    textsize = 3.2) +
-  coord_cartesian(clip = "off") +
-  theme_minimal(base_size = 10) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(
-      size = 10),
-    axis.text.x = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.text.y = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.line = element_line(
-      color = "black", 
-      linewidth = 0.5),
-    axis.line.x = element_line(
-      color = "black"),
-    axis.line.y = element_line(
-      color = "black"),
-    legend.position = "none",
-    plot.title = element_text(
-      hjust = 0.5, 
-      face = "bold", 
-      size = 11,
-      margin = margin(b = 10)),
-    plot.margin = margin(
-      t = 15,
-      r = 5.5,
-      b = 5.5,
-      l = 5.5)) +
-  labs(
-    title = "Ventromedial Prefrontal Cortex (vmPFC)",
-    y = "Mean pattern similarity")
+# # MANUSCRIPT FIG
+# ggplot(
+#   subject_means_vmpfc, 
+#   aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(
+#     alpha = 0.5, 
+#     adjust = 0.6, 
+#     width = 0.6, 
+#     justification = -0.25, 
+#     point_interval = mean_qi, 
+#     .width = c(0.66, 0.95)) +
+#   geom_boxplot(
+#     width = 0.15, 
+#     outlier.shape = NA, 
+#     alpha = 0.6,
+#     color = "black", 
+#     linetype = "solid",
+#     median.linewidth = 0.5) +
+#   geom_jitter(
+#     width = 0.08, 
+#     size = 1.2, 
+#     shape = 21, 
+#     color = "black", 
+#     fill = "white", 
+#     alpha = 0.5) +
+#   stat_summary(
+#     fun = mean, 
+#     geom = "point", 
+#     color = "black", 
+#     size = 3) +
+#   scale_x_discrete(
+#     labels = c(
+#       "same_show_episode" = "Same show,\nsame\nepisode",
+#       "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
+#       "diff_show" = "Different\nshows")) +
+#   scale_fill_manual(
+#     values = c(
+#       "same_show_episode" = "cornflowerblue",
+#       "same_show_diff_episode" = "hotpink",
+#       "diff_show" = "limegreen")) +
+#   geom_signif(
+#     comparisons = list(c("diff_show", "same_show_episode")),
+#     annotations = "*p < .001",
+#     y_position = y_max + 0.01,
+#     tip_length = 0.02, 
+#     textsize = 3.2) +
+#   coord_cartesian(clip = "off") +
+#   theme_minimal(base_size = 10) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(
+#       size = 10),
+#     axis.text.x = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.text.y = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.line = element_line(
+#       color = "black", 
+#       linewidth = 0.5),
+#     axis.line.x = element_line(
+#       color = "black"),
+#     axis.line.y = element_line(
+#       color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(
+#       hjust = 0.5, 
+#       face = "bold", 
+#       size = 11,
+#       margin = margin(b = 10)),
+#     plot.margin = margin(
+#       t = 15,
+#       r = 5.5,
+#       b = 5.5,
+#       l = 5.5)) +
+#   labs(
+#     title = "Ventromedial Prefrontal Cortex (vmPFC)",
+#     y = "Mean pattern similarity")
 
 # ggsave(
 #   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/vmPFC_pattern_similarity.pdf",
@@ -435,143 +435,143 @@ subject_means_pmcB <- pmcB_data_plots %>%
 # Position of sig bars
 y_max <- max(subject_means_pmcB$MeanCorrelation, na.rm = TRUE)
 
-# Violin plot 
-ggplot(subject_means_pmcB, aes(x = Condition, y = MeanCorrelation)) +
-  geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
-                              "same_show_diff_episode" = "Same show, different episode", 
-                              "diff_show" = "Different shows")) +
-  geom_jitter(shape = 21, color = "black", fill = "grey", 
-              position = position_jitter(width = 0.15),
-              size = 2, alpha = 0.5, show.legend = FALSE) +
-  geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
-              annotations = c("*p = 0.000"),
-              y_position = c(y_max + 0.025, y_max + 0.035),
-              tip_length = 0.02) +
-  theme_minimal() +
-  theme(
-    axis.line = element_line(color = "black"),       
-    axis.text.x = element_text(color = "black", size = 14),
-    axis.text.y = element_text(color = "black", size = 14),
-    axis.title.x = element_text(color = "black", size = 16, face = "bold"),
-    axis.title.y = element_text(color = "black", size = 16, face = "bold"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "bold")  ) +
-  labs(title = "Posterior Medial Cortex Baldassano (pmcB)",
-       y = "Mean pattern similarity", x = "")
+# # Violin plot 
+# ggplot(subject_means_pmcB, aes(x = Condition, y = MeanCorrelation)) +
+#   geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
+#                               "same_show_diff_episode" = "Same show, different episode", 
+#                               "diff_show" = "Different shows")) +
+#   geom_jitter(shape = 21, color = "black", fill = "grey", 
+#               position = position_jitter(width = 0.15),
+#               size = 2, alpha = 0.5, show.legend = FALSE) +
+#   geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
+#               annotations = c("*p = 0.000"),
+#               y_position = c(y_max + 0.025, y_max + 0.035),
+#               tip_length = 0.02) +
+#   theme_minimal() +
+#   theme(
+#     axis.line = element_line(color = "black"),       
+#     axis.text.x = element_text(color = "black", size = 14),
+#     axis.text.y = element_text(color = "black", size = 14),
+#     axis.title.x = element_text(color = "black", size = 16, face = "bold"),
+#     axis.title.y = element_text(color = "black", size = 16, face = "bold"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "bold")  ) +
+#   labs(title = "Posterior Medial Cortex Baldassano (pmcB)",
+#        y = "Mean pattern similarity", x = "")
 
-# Raincloud plot
-ggplot(subject_means_pmcB, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
-  geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
-                median.linewidth = 0.5) +
-  geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, \name episode",
-                              "same_show_diff_episode" = "Same show, \ndifferent episode", 
-                              "diff_show" = "Different shows")) +
-  scale_fill_manual(values = c(
-    "same_show_episode" = "cornflowerblue",
-    "same_show_diff_episode" = "hotpink",
-    "diff_show" = "limegreen")) +
-  geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
-              annotations = c("*p = 0.000"),
-              y_position = c(y_max + 0.01),
-              tip_length = 0.02, textsize = 6) +
-  theme_minimal(base_size = 14) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 25),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 20, color = "black"),
-    axis.line = element_line(color = "black", linewidth = 0.5),
-    axis.line.x = element_line(color = "black"),
-    axis.line.y = element_line(color = "black"),
-    legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
-  labs(
-    title = "Posterior Medial Cortex - Baldassano (PMC)",
-    y = "Mean pattern similarity")
+# # Raincloud plot
+# ggplot(subject_means_pmcB, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
+#   geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
+#                 median.linewidth = 0.5) +
+#   geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, \name episode",
+#                               "same_show_diff_episode" = "Same show, \ndifferent episode", 
+#                               "diff_show" = "Different shows")) +
+#   scale_fill_manual(values = c(
+#     "same_show_episode" = "cornflowerblue",
+#     "same_show_diff_episode" = "hotpink",
+#     "diff_show" = "limegreen")) +
+#   geom_signif(comparisons = list(c("diff_show", "same_show_episode")),
+#               annotations = c("*p = 0.000"),
+#               y_position = c(y_max + 0.01),
+#               tip_length = 0.02, textsize = 6) +
+#   theme_minimal(base_size = 14) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(size = 25),
+#     axis.text.x = element_text(size = 20, color = "black"),
+#     axis.text.y = element_text(size = 20, color = "black"),
+#     axis.line = element_line(color = "black", linewidth = 0.5),
+#     axis.line.x = element_line(color = "black"),
+#     axis.line.y = element_line(color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
+#   labs(
+#     title = "Posterior Medial Cortex - Baldassano (PMC)",
+#     y = "Mean pattern similarity")
 
-# MANUSCRIPT FIG
-ggplot(
-  subject_means_pmcB, 
-  aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(
-    alpha = 0.5, 
-    adjust = 0.6, 
-    width = 0.6, 
-    justification = -0.25, 
-    point_interval = mean_qi, 
-    .width = c(0.66, 0.95)) +
-  geom_boxplot(
-    width = 0.15, 
-    outlier.shape = NA, 
-    alpha = 0.6,
-    color = "black", 
-    linetype = "solid",
-    median.linewidth = 0.5) +
-  geom_jitter(
-    width = 0.08, 
-    size = 1.2, 
-    shape = 21, 
-    color = "black", 
-    fill = "white", 
-    alpha = 0.5) +
-  stat_summary(
-    fun = mean, 
-    geom = "point", 
-    color = "black", 
-    size = 3) +
-  scale_x_discrete(
-    labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
-  scale_fill_manual(
-    values = c(
-      "same_show_episode" = "cornflowerblue",
-      "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen")) +
-  geom_signif(
-    comparisons = list(c("diff_show", "same_show_episode")),
-    annotations = "*p < .001",
-    y_position = y_max + 0.01,
-    tip_length = 0.02, 
-    textsize = 3.2) +
-  coord_cartesian(clip = "off") +
-  theme_minimal(base_size = 10) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(
-      size = 10),
-    axis.text.x = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.text.y = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.line = element_line(
-      color = "black", 
-      linewidth = 0.5),
-    axis.line.x = element_line(
-      color = "black"),
-    axis.line.y = element_line(
-      color = "black"),
-    legend.position = "none",
-    plot.title = element_text(
-      hjust = 0.5, 
-      face = "bold", 
-      size = 11,
-      margin = margin(b = 10)),
-    plot.margin = margin(
-      t = 15,
-      r = 5.5,
-      b = 5.5,
-      l = 5.5)) +
-  labs(
-    title = "Posterior Medial Cortex (PMC)",
-    y = "Mean pattern similarity")
+# # MANUSCRIPT FIG
+# ggplot(
+#   subject_means_pmcB, 
+#   aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(
+#     alpha = 0.5, 
+#     adjust = 0.6, 
+#     width = 0.6, 
+#     justification = -0.25, 
+#     point_interval = mean_qi, 
+#     .width = c(0.66, 0.95)) +
+#   geom_boxplot(
+#     width = 0.15, 
+#     outlier.shape = NA, 
+#     alpha = 0.6,
+#     color = "black", 
+#     linetype = "solid",
+#     median.linewidth = 0.5) +
+#   geom_jitter(
+#     width = 0.08, 
+#     size = 1.2, 
+#     shape = 21, 
+#     color = "black", 
+#     fill = "white", 
+#     alpha = 0.5) +
+#   stat_summary(
+#     fun = mean, 
+#     geom = "point", 
+#     color = "black", 
+#     size = 3) +
+#   scale_x_discrete(
+#     labels = c(
+#       "same_show_episode" = "Same show,\nsame\nepisode",
+#       "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
+#       "diff_show" = "Different\nshows")) +
+#   scale_fill_manual(
+#     values = c(
+#       "same_show_episode" = "cornflowerblue",
+#       "same_show_diff_episode" = "hotpink",
+#       "diff_show" = "limegreen")) +
+#   geom_signif(
+#     comparisons = list(c("diff_show", "same_show_episode")),
+#     annotations = "*p < .001",
+#     y_position = y_max + 0.01,
+#     tip_length = 0.02, 
+#     textsize = 3.2) +
+#   coord_cartesian(clip = "off") +
+#   theme_minimal(base_size = 10) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(
+#       size = 10),
+#     axis.text.x = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.text.y = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.line = element_line(
+#       color = "black", 
+#       linewidth = 0.5),
+#     axis.line.x = element_line(
+#       color = "black"),
+#     axis.line.y = element_line(
+#       color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(
+#       hjust = 0.5, 
+#       face = "bold", 
+#       size = 11,
+#       margin = margin(b = 10)),
+#     plot.margin = margin(
+#       t = 15,
+#       r = 5.5,
+#       b = 5.5,
+#       l = 5.5)) +
+#   labs(
+#     title = "Posterior Medial Cortex (PMC)",
+#     y = "Mean pattern similarity")
 
 # ggsave(
 #   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/PMC_pattern_similarity.pdf",
@@ -622,129 +622,129 @@ subject_means_A1<- A1_data_plots %>%
 # Position of sig bars
 y_max <- max(subject_means_A1$MeanCorrelation, na.rm = TRUE)
 
-# Violin plot 
-ggplot(subject_means_A1, aes(x = Condition, y = MeanCorrelation)) +
-  geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
-                              "same_show_diff_episode" = "Same show, different episode", 
-                              "diff_show" = "Different shows")) +
-  geom_jitter(shape = 21, color = "black", fill = "grey", 
-              position = position_jitter(width = 0.15),
-              size = 2, alpha = 0.5, show.legend = FALSE) +
-  theme_minimal() +
-  theme(
-    axis.line = element_line(color = "black"),       
-    axis.text.x = element_text(color = "black", size = 14),
-    axis.text.y = element_text(color = "black", size = 14),
-    axis.title.x = element_text(color = "black", size = 16, face = "bold"),
-    axis.title.y = element_text(color = "black", size = 16, face = "bold"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "bold") ) +
-  labs(title = "Primary Auditory Cortex",
-       y = "Mean pattern similarity", x = "")
+# # Violin plot 
+# ggplot(subject_means_A1, aes(x = Condition, y = MeanCorrelation)) +
+#   geom_violin(trim = FALSE, alpha = 0.6, fill = "grey") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
+#                               "same_show_diff_episode" = "Same show, different episode", 
+#                               "diff_show" = "Different shows")) +
+#   geom_jitter(shape = 21, color = "black", fill = "grey", 
+#               position = position_jitter(width = 0.15),
+#               size = 2, alpha = 0.5, show.legend = FALSE) +
+#   theme_minimal() +
+#   theme(
+#     axis.line = element_line(color = "black"),       
+#     axis.text.x = element_text(color = "black", size = 14),
+#     axis.text.y = element_text(color = "black", size = 14),
+#     axis.title.x = element_text(color = "black", size = 16, face = "bold"),
+#     axis.title.y = element_text(color = "black", size = 16, face = "bold"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "bold") ) +
+#   labs(title = "Primary Auditory Cortex",
+#        y = "Mean pattern similarity", x = "")
 
-# Raincloud plot 
-ggplot(subject_means_A1, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
-  geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
-                median.linewidth = 0.5) +
-  geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
-  stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
-  scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
-                              "same_show_diff_episode" = "Same show, different episode", 
-                              "diff_show" = "Different shows")) +
-  scale_fill_manual(values = c(
-    "same_show_episode" = "cornflowerblue",
-    "same_show_diff_episode" = "hotpink",
-    "diff_show" = "limegreen")) +
-theme_minimal(base_size = 14) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size = 25),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 20, color = "black"),
-    axis.line = element_line(color = "black", linewidth = 0.5),
-    axis.line.x = element_line(color = "black"),
-    axis.line.y = element_line(color = "black"),
-    legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
-  labs(
-    title = "Primary Auditory Cortex",
-    y = "Mean pattern similarity")
+# # Raincloud plot 
+# ggplot(subject_means_A1, aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(alpha = 0.5, adjust = 0.6, width = 0.6, justification = -0.25, point_interval = mean_qi, .width = c(0.66, 0.95)) +
+#   geom_boxplot( width = 0.15, outlier.shape = NA, alpha = 0.6,color = "black", linetype = "solid",
+#                 median.linewidth = 0.5) +
+#   geom_jitter(width = 0.08,  size = 1.8, shape = 21, color = "black", fill = "white") +
+#   stat_summary(fun = mean, geom = "point", color = "black", size = 3) +
+#   scale_x_discrete(labels = c("same_show_episode" = "Same show, same episode",
+#                               "same_show_diff_episode" = "Same show, different episode", 
+#                               "diff_show" = "Different shows")) +
+#   scale_fill_manual(values = c(
+#     "same_show_episode" = "cornflowerblue",
+#     "same_show_diff_episode" = "hotpink",
+#     "diff_show" = "limegreen")) +
+# theme_minimal(base_size = 14) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(size = 25),
+#     axis.text.x = element_text(size = 20, color = "black"),
+#     axis.text.y = element_text(size = 20, color = "black"),
+#     axis.line = element_line(color = "black", linewidth = 0.5),
+#     axis.line.x = element_line(color = "black"),
+#     axis.line.y = element_line(color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(hjust = 0.5, face = "bold", size = 30)) +
+#   labs(
+#     title = "Primary Auditory Cortex",
+#     y = "Mean pattern similarity")
 
 
-# MANUSCRIPT FIGS 
-ggplot(
-  subject_means_A1, 
-  aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
-  stat_halfeye(
-    alpha = 0.5, 
-    adjust = 0.6, 
-    width = 0.6, 
-    justification = -0.25, 
-    point_interval = mean_qi, 
-    .width = c(0.66, 0.95)) +
-  geom_boxplot(
-    width = 0.15, 
-    outlier.shape = NA, 
-    alpha = 0.6,
-    color = "black", 
-    linetype = "solid",
-    median.linewidth = 0.5) +
-  geom_jitter(
-    width = 0.08, 
-    size = 1.2, 
-    shape = 21, 
-    color = "black", 
-    fill = "white",
-    alpha = 0.5) +
-  stat_summary(
-    fun = mean, 
-    geom = "point", 
-    color = "black", 
-    size = 3) +
-  scale_x_discrete(
-    labels = c(
-      "same_show_episode" = "Same show,\nsame\nepisode",
-      "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
-      "diff_show" = "Different\nshows")) +
-  scale_fill_manual(
-    values = c(
-      "same_show_episode" = "cornflowerblue",
-      "same_show_diff_episode" = "hotpink",
-      "diff_show" = "limegreen")) +
-  theme_minimal(base_size = 10) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(
-      size = 10),
-    axis.text.x = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.text.y = element_text(
-      size = 8.5, 
-      color = "black"),
-    axis.line = element_line(
-      color = "black", 
-      linewidth = 0.5),
-    axis.line.x = element_line(
-      color = "black"),
-    axis.line.y = element_line(
-      color = "black"),
-    legend.position = "none",
-    plot.title = element_text(
-      hjust = 0.5, 
-      face = "bold", 
-      size = 11,
-      margin = margin(b = 10)),
-    plot.margin = margin(
-      t = 15,
-      r = 5.5,
-      b = 5.5,
-      l = 5.5)) +
-  labs(
-    title = "Primary Auditory Cortex (A1)",
-    y = "Mean pattern similarity")
+# # MANUSCRIPT FIGS 
+# ggplot(
+#   subject_means_A1, 
+#   aes(x = Condition, y = MeanCorrelation, fill = Condition)) +
+#   stat_halfeye(
+#     alpha = 0.5, 
+#     adjust = 0.6, 
+#     width = 0.6, 
+#     justification = -0.25, 
+#     point_interval = mean_qi, 
+#     .width = c(0.66, 0.95)) +
+#   geom_boxplot(
+#     width = 0.15, 
+#     outlier.shape = NA, 
+#     alpha = 0.6,
+#     color = "black", 
+#     linetype = "solid",
+#     median.linewidth = 0.5) +
+#   geom_jitter(
+#     width = 0.08, 
+#     size = 1.2, 
+#     shape = 21, 
+#     color = "black", 
+#     fill = "white",
+#     alpha = 0.5) +
+#   stat_summary(
+#     fun = mean, 
+#     geom = "point", 
+#     color = "black", 
+#     size = 3) +
+#   scale_x_discrete(
+#     labels = c(
+#       "same_show_episode" = "Same show,\nsame\nepisode",
+#       "same_show_diff_episode" = "Same show,\ndifferent\nepisode", 
+#       "diff_show" = "Different\nshows")) +
+#   scale_fill_manual(
+#     values = c(
+#       "same_show_episode" = "cornflowerblue",
+#       "same_show_diff_episode" = "hotpink",
+#       "diff_show" = "limegreen")) +
+#   theme_minimal(base_size = 10) +
+#   theme(
+#     axis.title.x = element_blank(),
+#     axis.title.y = element_text(
+#       size = 10),
+#     axis.text.x = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.text.y = element_text(
+#       size = 8.5, 
+#       color = "black"),
+#     axis.line = element_line(
+#       color = "black", 
+#       linewidth = 0.5),
+#     axis.line.x = element_line(
+#       color = "black"),
+#     axis.line.y = element_line(
+#       color = "black"),
+#     legend.position = "none",
+#     plot.title = element_text(
+#       hjust = 0.5, 
+#       face = "bold", 
+#       size = 11,
+#       margin = margin(b = 10)),
+#     plot.margin = margin(
+#       t = 15,
+#       r = 5.5,
+#       b = 5.5,
+#       l = 5.5)) +
+#   labs(
+#     title = "Primary Auditory Cortex (A1)",
+#     y = "Mean pattern similarity")
 
 # ggsave(
 #   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/A1_pattern_similarity.pdf",
@@ -1255,7 +1255,7 @@ ggplot(
 # }) %>%
 #   bind_rows()
 
-# # Plot 
+# # Plot  
 # ggplot(perm_df, aes(x = stat)) +
 #   geom_histogram(
 #     bins = length(unique(perm_df$stat)),
@@ -1283,6 +1283,7 @@ ggplot(
 #     x = "Permutation Statistic",
 #     y = "Count") +
 #   theme_classic()
+
 
 
 

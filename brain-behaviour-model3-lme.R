@@ -337,7 +337,22 @@ head(same_show_same_episode_accuracies)
 accuracy_data <- bind_rows(
   same_show_diff_episode_accuracies,
   diff_show_accuracies,
-  same_show_same_episode_accuracies)
+  same_show_same_episode_accuracies
+) %>%
+  distinct() %>% # Remove exact duplicate rows across files
+  mutate(
+    # Ensure subject_id format matches correlation data ("01", "02", ...)
+    subject_id = str_remove(as.character(subject_id), "sub-"),
+    subject_id = str_pad(subject_id, width = 2, side = "left", pad = "0"),
+    
+    # Standardize category labels robustly
+    category = case_when(
+      str_detect(category, "(?i)diff.*show|different") ~ "diff_show",
+      str_detect(category, "(?i)same.*diff|different episode") ~ "same_show_diff_episode",
+      str_detect(category, "(?i)same.*same|same episode") ~ "same_show_episode",
+      TRUE ~ category
+    )
+  )
 
 # Check
 head(accuracy_data)
@@ -574,7 +589,7 @@ h1 <- ggplot(
   labs(
     title = "Different context",
     x = "Source memory accuracy",
-    y = "Mean pattern similarity") +
+    y = "Hippocampus mean pattern similarity") +
 coord_cartesian(
       ylim = c(.055, 0.11),
       xlim = c(0.0, 0.8)
@@ -638,7 +653,7 @@ h2 <- ggplot(
   labs(
     title = "Similar context",
     x = "Source memory accuracy",
-    y = "Mean pattern similarity") +
+    y = "Hippocampus mean pattern similarity") +
 coord_cartesian(
       ylim = c(.055, 0.11),
       xlim = c(0.0, 0.8)
@@ -648,11 +663,11 @@ coord_cartesian(
 # hippocampus - same context
 #######################################################################
 
-hippo_similar <- plots1_CORRS_with_hit_raw %>%
+hippo_same <- plots1_CORRS_with_hit_raw %>%
   filter(Region == "Hippocampus", Condition == "same_show_episode")
 
 h3 <- ggplot(
-  hippo_similar,
+  hippo_same,
   aes(
     x = hit_rate,
     y = mean_correlation,
@@ -704,7 +719,7 @@ h3 <- ggplot(
   labs(
     title = "Same context",
     x = "Source memory accuracy",
-    y = "Mean pattern similarity") +
+    y = "Hippocampus mean pattern similarity") +
 coord_cartesian(
       ylim = c(.055, 0.11),
       xlim = c(0.0, 0.8)
@@ -720,53 +735,53 @@ hplot <- plot_grid(
 
 hplot
 
-# save combined plots as svg
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.svg",
-  plot = hplot,
-  width = 6.5,
-  height = 3,
-  units = "in")
+# # save combined plots as svg
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.svg",
+#   plot = hplot,
+#   width = 6.5,
+#   height = 3,
+#   units = "in")
 
-# save combined plots as pdf
-  ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.pdf",
-  plot = hplot,
-  width = 6.5,
-  height = 3,
-  units = "in")
+# # save combined plots as pdf
+#   ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim.pdf",
+#   plot = hplot,
+#   width = 6.5,
+#   height = 3,
+#   units = "in")
 
-# save just same context condition (stretched) as svg
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.svg",
-  plot = h3,
-  width = 6.5,
-  height = 3,
-  units = "in")
+# # save just same context condition (stretched) as svg
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.svg",
+#   plot = h3,
+#   width = 6.5,
+#   height = 3,
+#   units = "in")
 
-  # save just same context condition (stretched) as pdf
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.pdf",
-  plot = h3,
-  width = 6.5,
-  height = 3,
-  units = "in")
+#   # save just same context condition (stretched) as pdf
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY_stretched.pdf",
+#   plot = h3,
+#   width = 6.5,
+#   height = 3,
+#   units = "in")
 
-# save just same context condition (not stretched) as svg
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.svg",
-  plot = h3,
-  width = 3,
-  height = 3,
-  units = "in")
+# # save just same context condition (not stretched) as svg
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.svg",
+#   plot = h3,
+#   width = 3,
+#   height = 3,
+#   units = "in")
 
-  # save just same context condition (not stretched) as pdf
-ggsave(
-  filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.pdf",
-  plot = h3,
-  width = 3,
-  height = 3,
-  units = "in")
+#   # save just same context condition (not stretched) as pdf
+# ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/hipp_source_mem_patt_sim_SAME_ONLY.pdf",
+#   plot = h3,
+#   width = 3,
+#   height = 3,
+#   units = "in")
 
 
 

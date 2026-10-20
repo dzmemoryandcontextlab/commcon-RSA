@@ -1809,7 +1809,7 @@ make_raincloud_wide <- function(df, x_var, y_var, x_label = NULL, y_label = NULL
 
   labs(
     title = {{ plot_title }},
-    y = "Mean pattern similarity"
+    y = "Parahippocampal cortex\nmean pattern similarity"
     ) 
 
  if (!is.null(x_label)) {
@@ -1817,14 +1817,14 @@ make_raincloud_wide <- function(df, x_var, y_var, x_label = NULL, y_label = NULL
       axis.text.x = element_text(
       size = 10, 
       color = "black",
-      hjust = 0,
+      hjust = 0.3,
       margin = margin(t = 2)
       )) +
     scale_x_discrete(
     labels = c(
-      "same_show_episode" = "Same\ncontext",
-      "same_show_diff_episode" = "Similar\ncontext", 
-      "diff_show" = "Different\ncontext")) 
+      "same_show_episode" = "Same context",
+      "same_show_diff_episode" = "Similar context", 
+      "diff_show" = "Different context")) 
   }
 
    if (!is.null(y_label)) {
@@ -1840,7 +1840,7 @@ make_raincloud_wide <- function(df, x_var, y_var, x_label = NULL, y_label = NULL
 }
 
 
-rcPHC <- make_raincloud_wide(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "Parahippocampal cortex (PHC)")
+rcPHC <- make_raincloud_wide(subject_means_parahippocampus, Condition, MeanCorrelation, x_label = TRUE, y_label = TRUE, "")
 
 rcPHCs <- rcPHC + geom_signif(
               annotations = c("***", "*"),
@@ -1856,11 +1856,19 @@ rcPHCs <- rcPHC + geom_signif(
 rcPHCs
 
 # ggsave(
+#   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PHC_only_wide.pdf",
+#   plot = rcPHCs,
+#   width = 5,
+#   height = 3,
+#   units = "in")
+
+# ggsave(
 #   filename = "/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PHC_only_wide.svg",
 #   plot = rcPHCs,
 #   width = 5,
 #   height = 3,
 #   units = "in")
+
 
 #######################################################################
 # Paired raincloud plots (lines connecting subject data points)
@@ -1968,9 +1976,9 @@ make_raincloud_paired <- function(df, x_var, y_var, subject_var,
   scale_x_discrete(
     limits = selected_conditions,
     labels = if (!is.null(x_label)) c(
-      "same_show_episode" = "Same\ncontext",
-      "same_show_diff_episode" = "Similar\ncontext", 
-      "diff_show" = "Different\ncontext"
+      "same_show_episode" = "Same context",
+      "same_show_diff_episode" = "Similar context", 
+      "diff_show" = "Different context"
     ) else waiver()
   ) +
 
@@ -1998,7 +2006,7 @@ make_raincloud_paired <- function(df, x_var, y_var, subject_var,
 
   labs(
     title = {{ plot_title }},
-    y = "Mean pattern similarity"
+    y = "Parahippocampal cortex\nmean pattern similarity"
   ) 
 
   if (!is.null(y_label)) {
@@ -2022,7 +2030,7 @@ rc_paired1 <- make_raincloud_paired(
   selected_conditions = c("same_show_episode", "diff_show"),
   x_label = TRUE, 
   y_label = TRUE, 
-  plot_title = "Global context: same context > different context"
+  plot_title = ""
 ) + 
     geom_signif(
       annotations = c("***"),
@@ -2045,7 +2053,7 @@ rc_paired2 <- make_raincloud_paired(
   selected_conditions = c("same_show_episode", "same_show_diff_episode"),
   x_label = TRUE, 
   y_label = TRUE, 
-  plot_title = "Local context: same context > similar context"
+  plot_title = ""
 ) + 
     geom_signif(
       annotations = c("*"),
