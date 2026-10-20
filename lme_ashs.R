@@ -1983,6 +1983,7 @@ make_raincloud_paired <- function(df, x_var, y_var, subject_var,
   ) +
 
   scale_y_continuous(
+    limits = c(0.05, 0.16),
     labels = label_number(accuracy = 0.01),
     expand = expansion(mult = c(0.1, 0.2))
   ) +
