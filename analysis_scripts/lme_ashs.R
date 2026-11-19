@@ -2098,3 +2098,147 @@ rc_paired2
 #   height = 3,
 #   units = "in")
 
+
+#######################################################################
+# PRE-only and POST-only versions of rc1-rc6
+#######################################################################
+
+session_paths <- c(
+  PRE  = "/Volumes/Chi/Model3_PRE",
+  POST = "/Volumes/BrusselsGriffon/CommCon/SPM_results/Model3_POST"
+)
+
+# Raw ROI file names for each plotted region (same ROIs as the DIFF plots)
+region_rois <- list(
+  vmPFC       = c("vmPFC_left_resampled", "vmPFC_right_resampled"),
+  PMC         = c("PMC_3mm_resampled_bin"),
+  Hippocampus = c("left_Hippocampus_MNI-BOLD", "right_Hippocampus_MNI-BOLD"),
+  PHC         = c("left_PHC_MNI-BOLD", "right_PHC_MNI-BOLD"),
+  PRC         = c("left_PRC_MNI-BOLD", "right_PRC_MNI-BOLD"),
+  A1          = c("left_A1_mask_resampled", "right_A1_mask_resampled")
+)
+
+main_conditions <- c("same_show_episode", "same_show_diff_episode", "diff_show")
+
+# Load every subject x ROI x condition file for one session
+load_session <- function(session) {
+  imap_dfr(region_rois, function(rois, region) {
+    expand_grid(roi = rois, condition = main_conditions, sub = subject_ids) %>%
+      pmap_dfr(function(roi, condition, sub) {
+        f <- file.path(session_paths[[session]], paste0("Model3_", sub),
+                       paste0(sub, "_", roi, "_", session, "_", condition, "_corrs.csv"))
+        read_csv(f, show_col_types = FALSE) %>%
+          mutate(Subject = sub, Condition = condition, ROI = roi)
+      }) %>%
+      mutate(Region = region)
+  })
+}
+
+# Per-subject means, same as the DIFF plots (averaged over both hemispheres)
+subject_means_session <- function(df) {
+  df %>%
+    group_by(Region, Subject, Condition) %>%
+    summarise(MeanCorrelation = mean(Correlation, na.rm = TRUE), .groups = "drop") %>%
+    mutate(Condition = factor(Condition, levels = reversed_levels))
+}
+
+# Build rc1-rc6 for one session, same layout/labels as the originals
+make_session_plots <- function(means) {
+  rc <- function(region, x_label, y_label) {
+    make_raincloud(filter(means, Region == region), Condition, MeanCorrelation,
+                   x_label = x_label, y_label = y_label, region)
+  }
+  list(
+    rc1 = rc("vmPFC",       NULL, TRUE),
+    rc2 = rc("PMC",         NULL, NULL),
+    rc3 = rc("Hippocampus", NULL, TRUE),
+    rc4 = rc("PHC",         NULL, NULL),
+    rc5 = rc("PRC",         TRUE, TRUE),
+    rc6 = rc("A1",          TRUE, NULL)
+  )
+}
+
+pre_raw   <- load_session("PRE")
+post_raw  <- load_session("POST")
+pre_means  <- subject_means_session(pre_raw)
+post_means <- subject_means_session(post_raw)
+
+p_to_stars <- function(p) {
+  case_when(p < .001 ~ "***", p < .01 ~ "**", p < .05 ~ "*", TRUE ~ NA_character_)
+}
+
+tukey_by_region <- function(raw_df) {
+  raw_df %>%
+    mutate(Condition = factor(Condition, levels = reversed_levels)) %>%
+    group_by(Region) %>%
+    group_modify(~ {
+      tk <- TukeyHSD(aov(Correlation ~ Condition, data = .x))$Condition
+      tibble(comparison = rownames(tk), diff = tk[, "diff"], p_adj = tk[, "p adj"])
+    }) %>%
+    ungroup() %>%
+    separate(comparison, into = c("cond1", "cond2"), sep = "-") %>%
+    mutate(stars = p_to_stars(p_adj))
+}
+
+pre_tukey  <- tukey_by_region(pre_raw)
+post_tukey <- tukey_by_region(post_raw)
+
+pre_tukey    
+post_tukey
+
+add_stars <- function(plot, region, tukey, means) {
+  sig <- tukey %>%
+    filter(Region == region, !is.na(stars)) %>%
+    mutate(
+      x1 = match(cond1, reversed_levels),
+      x2 = match(cond2, reversed_levels),
+      xmin = pmin(x1, x2) + 0.2,   # +0.2 matches the offset you used by hand
+      xmax = pmax(x1, x2) + 0.2
+    ) %>%
+    arrange(xmax - xmin)           # shorter brackets lower, longer ones stacked above
+
+  if (nrow(sig) == 0) return(plot)
+
+  y <- means$MeanCorrelation[means$Region == region]
+  top  <- max(y, na.rm = TRUE)
+  step <- diff(range(y, na.rm = TRUE)) * 0.08
+
+  plot + geom_signif(
+    annotations = sig$stars,
+    y_position  = top + step * seq_len(nrow(sig)),
+    xmin = sig$xmin, xmax = sig$xmax,
+    hjust = 0.2, vjust = 0.4, tip_length = 0.02, textsize = 5
+  )
+}
+
+regions <- c("vmPFC", "PMC", "Hippocampus", "PHC", "PRC", "A1")  # order of rc1..rc6
+
+pre_plots_s  <- map2(pre_plots,  regions, ~ add_stars(.x, .y, pre_tukey,  pre_means))
+post_plots_s <- map2(post_plots, regions, ~ add_stars(.x, .y, post_tukey, post_means))
+
+psa_plots_PRE  <- plot_grid(plotlist = pre_plots_s,  ncol = 2, labels = "AUTO")
+psa_plots_POST <- plot_grid(plotlist = post_plots_s, ncol = 2, labels = "AUTO")
+
+
+add_figure_title <- function(grid, title) {
+  title_row <- ggdraw() +
+    draw_label(title, fontface = "bold", size = 14, x = 0.5, hjust = 0.5)
+  plot_grid(title_row, grid, ncol = 1, rel_heights = c(0.06, 1))
+}
+
+psa_plots_PRE <- add_figure_title(
+  plot_grid(plotlist = pre_plots_s, ncol = 2, labels = "AUTO"),
+  "PRE: pattern similarity before learning"
+)
+
+psa_plots_POST <- add_figure_title(
+  plot_grid(plotlist = post_plots_s, ncol = 2, labels = "AUTO"),
+  "POST: pattern similarity after learning"
+)
+psa_plots_PRE
+psa_plots_POST
+
+# ggsave("/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_PRE_josh.pdf",
+#        psa_plots_PRE, width = 6.5, height = 6.75, units = "in")
+# ggsave("/Volumes/BrusselsGriffon/CommCon/manuscript-figures/psa_plot_POST_josh.pdf",
+#        psa_plots_POST, width = 6.5, height = 6.75, units = "in")

@@ -4,7 +4,8 @@ library(tidyr)
 library(ggplot2)
 
 # Root dir
-root_dir <- "/Users/yorkie/Documents/CommCon/data/raw_behavioral"
+# root_dir <- "/Users/yorkie/Documents/CommCon/data/raw_behavioral"
+root_dir <- "/Volumes/BrusselsGriffon/CommCon/yorkie/data/raw_behavioral"
 
 # Subject folders
 subject_folders <- list.dirs(root_dir, full.names = TRUE, recursive = FALSE)
